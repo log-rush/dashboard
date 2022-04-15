@@ -1,5 +1,22 @@
 <template>
-  <router-view></router-view>
+  <n-config-provider :theme="darkTheme">
+    <div id="main">
+      <router-view></router-view>
+    </div>
+  </n-config-provider>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { darkTheme, NConfigProvider } from 'naive-ui';
+</script>
+
+<style>
+#main {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+</style>
