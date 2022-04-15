@@ -1,4 +1,5 @@
 <template>
+  Dashboard
   <router-view></router-view>
 </template>
 
