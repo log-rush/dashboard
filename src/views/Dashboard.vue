@@ -13,22 +13,32 @@
       <div class="menu-layout">
         <n-menu
           :collapsed="collapsed"
-          :collapsed-width="64"
-          :root-indent="12"
           :render-label="renderMenuLabel"
           :options="MainMenu"
+          :value="selectedValue"
           :expand-icon="CreateIconRenderer('mdi:chevron-down')"
-          @update-value="onSelectedOption"
+        />
+        <n-menu
+          :collapsed="collapsed"
+          :render-label="renderMenuLabel"
+          :options="DataSourceMenu"
+          :value="selectedValue"
+          :expand-icon="CreateIconRenderer('mdi:chevron-down')"
+        />
+        <n-menu
+          :collapsed="collapsed"
+          :render-label="renderMenuLabel"
+          :options="ViewsMenu"
+          :value="selectedValue"
+          :expand-icon="CreateIconRenderer('mdi:chevron-down')"
         />
         <div class="menu-spacer"></div>
         <n-menu
           :collapsed="collapsed"
-          :collapsed-width="64"
-          :root-indent="12"
           :render-label="renderMenuLabel"
           :options="BottomMenu"
+          :value="selectedValue"
           :expand-icon="CreateIconRenderer('mdi:chevron-down')"
-          @update-value="onSelectedOption"
         />
       </div>
     </n-layout-sider>
@@ -39,35 +49,44 @@
 </template>
 
 <script setup lang="ts">
-import { NLayout, NLayoutSider, NMenu, NSpace } from 'naive-ui';
+import { NLayout, NLayoutSider, NMenu } from 'naive-ui';
 import type { MenuOption } from 'naive-ui';
-import { h, ref } from 'vue';
+import { h, onMounted, ref, VNode, watch } from 'vue';
 import { IconRenderer, CreateIconRenderer } from '@/components/Icon';
-import { useRouter } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 
-const router = useRouter();
+const route = useRoute();
 const collapsed = ref(true);
+const selectedValue = ref<string | undefined>(undefined);
 
-const onSelectedOption = (_key: string, option: MenuOption) => {
-  if ('href' in option) {
-    router.push(option.href as string);
+watch(
+  () => route.path,
+  (path) => setMenuSelectionByPath(path),
+);
+
+onMounted(() => {
+  setMenuSelectionByPath(route.path);
+});
+
+const setMenuSelectionByPath = (path: string) => {
+  const parts = path.split('/');
+  if (parts.length > 1) {
+    if (parts[parts.length - 1] === '') {
+      selectedValue.value = 'home';
+    } else {
+      selectedValue.value = parts[parts.length - 1];
+    }
   }
 };
 
 const renderMenuLabel = (option: MenuOption) => {
   if ('href' in option) {
-    return h('router-link', { to: option.href }, [option.label as string]);
+    return h(RouterLink as unknown as VNode, { to: option.href }, () => [option.label]);
   }
   return option.label as string;
 };
 
 const BottomMenu: MenuOption[] = [
-  {
-    label: 'Logout',
-    key: 'logout',
-    href: '/log-out',
-    icon: () => IconRenderer('mdi:logout'),
-  },
   {
     label: 'Settings',
     key: 'settings',
@@ -83,10 +102,14 @@ const MainMenu: MenuOption[] = [
     href: '/',
     icon: () => IconRenderer('mdi:home'),
   },
+];
+
+const DataSourceMenu: MenuOption[] = [
   {
     label: 'Data Sources',
     key: 'data-sources',
     icon: () => IconRenderer('mdi:server'),
+    href: '/data-sources',
     children: [
       {
         label: 'a-1',
@@ -100,10 +123,14 @@ const MainMenu: MenuOption[] = [
       },
     ],
   },
+];
+
+const ViewsMenu: MenuOption[] = [
   {
     label: 'Views',
     key: 'views',
     icon: () => IconRenderer('mdi:view-dashboard-variant'),
+    href: '/views',
     children: [
       {
         label: 'a-2',
