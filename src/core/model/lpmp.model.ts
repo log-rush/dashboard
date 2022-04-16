@@ -33,8 +33,17 @@ export interface LPMPSubscribeMessage extends LPMPBaseMessage {
   };
 }
 
+export interface LPMPUnsubscribeMessage extends LPMPBaseMessage {
+  payload: {
+    stream: string;
+  };
+}
+
 export interface LPMPCloseMessage extends LPMPBaseMessage {
   payload: {
     stream: string;
   };
 }
+
+export type LPMPPingMessage = LPMPBaseMessage;
+export type LPMPPongMessage = LPMPBaseMessage;

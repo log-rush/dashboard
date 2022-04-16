@@ -79,6 +79,22 @@ Message:
 }
 ```
 
+### Unsubscribe From Stream
+
+Unsubscribe from a log stream
+
+Strategy: send by client; no answer
+
+Message:
+```json
+{
+  "opr": "Unsubscribe",
+  "payload": {
+    "stream": "<stream-id>"
+  }
+}
+```
+
 ### Stream Closed
 
 Notify, that a los stream was closed
@@ -95,3 +111,24 @@ Message:
 }
 ```
 
+### Ping/Pong
+
+Send Pings/Pongs between client or server
+
+Strategy: Bidirectional from client/server; Push
+
+Request:
+```json
+{
+  "opr": "Ping",
+  "payload": {}
+}
+```
+
+Response:
+```json
+{
+  "opr": "Pong",
+  "payload": {}
+}
+```
