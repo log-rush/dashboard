@@ -22,8 +22,14 @@ export const createPermissions = (...permissions: Permission[]): number => {
 export const usePermissions = () => {
   const auth = useAuthStore();
 
-  const hasPermission1 = computed(() => (auth.permissions.value & PermissionDefinitions[Permission.Test1]) > 0);
-  const hasPermission2 = computed(() => (auth.permissions.value & PermissionDefinitions[Permission.Test2]) > 0);
+  const hasPermission1 = computed(
+    () =>
+      (auth.permissions.value & PermissionDefinitions[Permission.Test1]) > 0,
+  );
+  const hasPermission2 = computed(
+    () =>
+      (auth.permissions.value & PermissionDefinitions[Permission.Test2]) > 0,
+  );
 
   return {
     hasPermission1,
