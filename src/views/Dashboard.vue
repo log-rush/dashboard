@@ -81,7 +81,9 @@ const setMenuSelectionByPath = (path: string) => {
 
 const renderMenuLabel = (option: MenuOption) => {
   if ('href' in option) {
-    return h(RouterLink as unknown as VNode, { to: option.href }, () => [option.label]);
+    return h(RouterLink as unknown as VNode, { to: option.href }, () => [
+      option.label,
+    ]);
   }
   return option.label as string;
 };
