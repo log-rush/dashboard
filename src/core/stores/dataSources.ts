@@ -9,7 +9,7 @@ enum Keys {
 const dataSources = ref<DataSource[]>([]);
 
 const createDataSource = async (url: string): Promise<boolean> => {
-  const dataSource = await DataSourcesService.registerDataSource(url);
+  const dataSource = await DataSourcesService.getDataSource(url);
   if (dataSource) {
     dataSources.value = [...dataSources.value, dataSource];
     return true;
@@ -30,7 +30,7 @@ const init = async () => {
     const parsedDataSources = JSON.parse(storedSources) as string[];
 
     for (const url of parsedDataSources) {
-      const ds = await DataSourcesService.registerDataSource(url);
+      const ds = await DataSourcesService.getDataSource(url);
       if (ds) {
         dataSources.value = [...dataSources.value, ds];
       }
