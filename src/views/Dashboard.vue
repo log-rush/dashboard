@@ -42,9 +42,9 @@
         />
       </div>
     </n-layout-sider>
-    <n-layout>
+    <div style="position: relative; padding: 24px; width: 100%">
       <router-view></router-view>
-    </n-layout>
+    </div>
   </n-layout>
 </template>
 
