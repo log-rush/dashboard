@@ -11,7 +11,7 @@ const dataSources = ref<DataSource[]>([]);
 const createDataSource = async (url: string): Promise<boolean> => {
   const dataSource = await DataSourcesService.registerDataSource(url);
   if (dataSource) {
-    dataSources.value.push(dataSource);
+    dataSources.value = [...dataSources.value, dataSource];
     return true;
   }
   return false;
@@ -20,25 +20,21 @@ const createDataSource = async (url: string): Promise<boolean> => {
 watch(dataSources, (ds) => {
   localStorage.setItem(
     Keys.DataSources,
-    JSON.stringify(
-      ds.map((ds: Partial<DataSource>) => {
-        delete ds['isConnected'];
-      }),
-    ),
+    JSON.stringify(ds.map((ds) => ds.url)),
   );
 });
 
-const init = () => {
+const init = async () => {
   const storedSources = localStorage.getItem(Keys.DataSources);
   if (storedSources) {
-    const parsedDataSources = JSON.parse(storedSources) as Omit<
-      DataSource,
-      'isConnected'
-    >[];
-    dataSources.value = parsedDataSources.map((ds) => ({
-      ...ds,
-      isConnected: false,
-    }));
+    const parsedDataSources = JSON.parse(storedSources) as string[];
+
+    for (const url of parsedDataSources) {
+      const ds = await DataSourcesService.registerDataSource(url);
+      if (ds) {
+        dataSources.value = [...dataSources.value, ds];
+      }
+    }
   }
 };
 init();
