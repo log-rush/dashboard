@@ -1,5 +1,5 @@
 <template>
-  <n-page-header>
+  <page-layout title="Datasources">
     <n-space vertical size="large">
       <n-space vertical>
         <n-list bordered v-if="allDataSources.length > 0">
@@ -40,47 +40,19 @@
         @close="createModelOpen = false"
       />
     </n-space>
-    <template #title>
-      <n-h1 style="margin: 0">Datasources</n-h1>
-    </template>
-    <template #header>
-      <n-breadcrumb>
-        <n-breadcrumb-item>
-          <router-link to="/">
-            <n-text> Dashboard </n-text>
-          </router-link>
-        </n-breadcrumb-item>
-        <n-breadcrumb-item>
-          <router-link to="/data-sources">
-            <n-text> Datasources </n-text>
-          </router-link>
-        </n-breadcrumb-item>
-      </n-breadcrumb>
-    </template>
+
     <template #extra>
       <n-space>
         <n-button ghost @click="createModelOpen = true">Add New</n-button>
         <n-button ghost>Refresh</n-button>
       </n-space>
     </template>
-    <template #footer> Copyright </template>
-  </n-page-header>
+  </page-layout>
 </template>
 
 <script setup lang="ts">
-import {
-  NH1,
-  NSpace,
-  NPageHeader,
-  NBreadcrumb,
-  NBreadcrumbItem,
-  NButton,
-  NText,
-  NList,
-  NListItem,
-  NThing,
-  NEmpty,
-} from 'naive-ui';
+import { NSpace, NButton, NList, NListItem, NThing, NEmpty } from 'naive-ui';
+import PageLayout from '@/components/util/PageLayout.vue';
 import CreateDataSource from '@/components/dataSources/modals/CreateDataSource.vue';
 import { computed, ref } from 'vue';
 import { useDataSources } from '@/core/stores/dataSources';

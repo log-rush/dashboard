@@ -5,31 +5,52 @@ import DataSource from '@/views/dashboard/DataSource.vue';
 import DataSourcesList from '@/views/dashboard/DataSourcesList.vue';
 import View from '@/views/dashboard/View.vue';
 import ViewsList from '@/views/dashboard/ViewsList.vue';
+import EmptyOutlet from '@/components/util/EmptyRouterView.vue';
+import { createRouteMeta } from '@/core/model/routeMetaData';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     component: Dashboard,
+    meta: createRouteMeta({
+      breadcrumb: {
+        title: 'Dashboard',
+        link: '/',
+      },
+    }),
     children: [
       {
         path: '',
         component: DashboardIndex,
       },
       {
+        path: '/data-sources',
+        component: EmptyOutlet,
+        meta: createRouteMeta({
+          breadcrumb: {
+            title: 'DataSources',
+            link: '/data-sources',
+          },
+        }),
+        children: [
+          {
+            path: '',
+            component: DataSourcesList,
+          },
+          {
+            path: '/data-sources/:id',
+            component: DataSource,
+            meta: createRouteMeta({}),
+          },
+        ],
+      },
+      {
         path: '/views',
         component: ViewsList,
       },
       {
-        path: '/data-sources',
-        component: DataSourcesList,
-      },
-      {
         path: '/views/:id',
         component: View,
-      },
-      {
-        path: '/data-sources/:id',
-        component: DataSource,
       },
     ],
   },

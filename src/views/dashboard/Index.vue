@@ -1,5 +1,5 @@
 <template>
-  <n-page-header>
+  <page-layout title="Dashboard">
     <n-space vertical size="large">
       <n-space vertical>
         <n-h2>Overview</n-h2>
@@ -13,36 +13,15 @@
         </n-space>
       </n-space>
     </n-space>
-    <template #title>
-      <n-h1 style="margin: 0">log-rush Dashboard</n-h1>
-    </template>
-    <template #header>
-      <n-breadcrumb>
-        <n-breadcrumb-item>
-          <router-link to="/">
-            <n-text> Dashboard </n-text>
-          </router-link>
-        </n-breadcrumb-item>
-      </n-breadcrumb>
-    </template>
     <template #extra>
       <n-space>
         <n-button ghost>Refresh</n-button>
       </n-space>
     </template>
-    <template #footer> Copyright </template>
-  </n-page-header>
+  </page-layout>
 </template>
 
 <script setup lang="ts">
-import {
-  NH1,
-  NH2,
-  NSpace,
-  NPageHeader,
-  NBreadcrumb,
-  NBreadcrumbItem,
-  NButton,
-  NText,
-} from 'naive-ui';
+import { NH2, NSpace, NButton, NText } from 'naive-ui';
+import PageLayout from '@/components/util/PageLayout.vue';
 </script>
