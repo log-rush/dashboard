@@ -9,7 +9,7 @@ enum Keys {
 const dataSources = ref<DataSource[]>([]);
 
 const createDataSource = async (url: string): Promise<boolean> => {
-  const dataSource = await DataSourcesService.connectToDataSource(url);
+  const dataSource = await DataSourcesService.registerDataSource(url);
   if (dataSource) {
     dataSources.value.push(dataSource);
     return true;
