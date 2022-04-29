@@ -41,7 +41,7 @@ export const LogRushHttpApi = {
     streamId: string,
   ): Promise<LogStream | undefined> {
     try {
-      const req = await fetch(`${dataSource.url}streams/${streamId}`);
+      const req = await fetch(`${dataSource.url}stream/${streamId}`);
       if (req.status !== 200) {
         return undefined;
       }
