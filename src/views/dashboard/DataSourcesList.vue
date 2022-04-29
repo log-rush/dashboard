@@ -17,7 +17,11 @@
             </n-thing>
             <template #suffix>
               <n-space justify="end" align="center" :wrap="false">
-                (Status)
+                <Status
+                  :status="
+                    dataSource.isConnected ? 'connected' : 'disconnected'
+                  "
+                />
                 <n-button @click="deleteDataSource(dataSource)"
                   >Delete</n-button
                 >
@@ -68,6 +72,7 @@ import { computed, ref } from 'vue';
 import { useDataSources } from '@/core/stores/dataSources';
 import { DataSource } from '@/core/model/dataSource';
 import { useRouter } from 'vue-router';
+import Status from '@/components/util/Status.vue';
 
 const dataSources = useDataSources();
 const dialog = useDialog();
