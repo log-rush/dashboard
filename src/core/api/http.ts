@@ -15,6 +15,7 @@ export const LogRushHttpApi = {
       }
       const res: DataSourceInfoResponse = await req.json();
       return {
+        id: res.id,
         url: url,
         name: res.name,
         version: res.version,

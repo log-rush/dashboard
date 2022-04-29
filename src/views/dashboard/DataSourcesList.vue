@@ -92,6 +92,6 @@ const deleteDataSource = (ds: DataSource) => {
 };
 
 const handleShow = (ds: DataSource) => {
-  router.push(`/data-sources/${ds.name}`);
+  router.push(`/data-sources/${ds.id}`);
 };
 </script>

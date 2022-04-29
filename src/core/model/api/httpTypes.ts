@@ -1,4 +1,5 @@
 export type DataSourceInfoResponse = {
+  id: string;
   name: string;
   version: string;
 };

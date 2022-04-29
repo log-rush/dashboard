@@ -18,9 +18,7 @@ const createDataSource = async (url: string): Promise<boolean> => {
 };
 
 const deleteDataSource = (dataSource: DataSource) => {
-  dataSources.value = dataSources.value.filter(
-    (ds) => dataSource.url !== ds.url,
-  );
+  dataSources.value = dataSources.value.filter((ds) => dataSource.id !== ds.id);
 };
 
 watch(dataSources, (ds) => {
