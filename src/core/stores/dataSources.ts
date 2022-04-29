@@ -20,20 +20,31 @@ const createDataSource = async (url: string): Promise<boolean> => {
 watch(dataSources, (ds) => {
   localStorage.setItem(
     Keys.DataSources,
-    JSON.stringify(ds.map((ds) => ds.url)),
+    JSON.stringify(
+      ds.map((ds: Partial<DataSource>) => {
+        delete ds['isConnected'];
+        return ds;
+      }),
+    ),
   );
 });
 
 const init = async () => {
   const storedSources = localStorage.getItem(Keys.DataSources);
   if (storedSources) {
-    const parsedDataSources = JSON.parse(storedSources) as string[];
+    const parsedDataSources = JSON.parse(storedSources) as Omit<
+      DataSource,
+      'isConnected'
+    >[];
 
-    for (const url of parsedDataSources) {
-      const ds = await DataSourcesService.getDataSource(url);
-      if (ds) {
-        dataSources.value = [...dataSources.value, ds];
-      }
+    for (const ds of parsedDataSources) {
+      dataSources.value = [
+        ...dataSources.value,
+        {
+          ...ds,
+          isConnected: false,
+        },
+      ];
     }
   }
 };
