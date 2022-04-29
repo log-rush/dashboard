@@ -17,6 +17,12 @@ const createDataSource = async (url: string): Promise<boolean> => {
   return false;
 };
 
+const deleteDataSource = (dataSource: DataSource) => {
+  dataSources.value = dataSources.value.filter(
+    (ds) => dataSource.url !== ds.url,
+  );
+};
+
 watch(dataSources, (ds) => {
   localStorage.setItem(
     Keys.DataSources,
@@ -53,6 +59,7 @@ init();
 const Store = {
   dataSources,
   createDataSource,
+  deleteDataSource,
 };
 
 export const useDataSources = (): typeof Store => Store;

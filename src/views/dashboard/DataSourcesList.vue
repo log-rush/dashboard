@@ -18,8 +18,10 @@
             <template #suffix>
               <n-space justify="end" align="center" :wrap="false">
                 (Status)
-                <n-button>Delete</n-button>
-                <n-button>Show</n-button>
+                <n-button @click="deleteDataSource(dataSource)"
+                  >Delete</n-button
+                >
+                <n-button @click="handleShow(dataSource)">Show</n-button>
               </n-space>
             </template>
           </n-list-item>
@@ -51,13 +53,45 @@
 </template>
 
 <script setup lang="ts">
-import { NSpace, NButton, NList, NListItem, NThing, NEmpty } from 'naive-ui';
+import {
+  NSpace,
+  NButton,
+  NList,
+  NListItem,
+  NThing,
+  NEmpty,
+  useDialog,
+} from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
 import CreateDataSource from '@/components/dataSources/modals/CreateDataSource.vue';
 import { computed, ref } from 'vue';
 import { useDataSources } from '@/core/stores/dataSources';
+import { DataSource } from '@/core/model/dataSource';
+import { useRouter } from 'vue-router';
 
 const dataSources = useDataSources();
+const dialog = useDialog();
+const router = useRouter();
 const allDataSources = computed(() => dataSources.dataSources.value);
 const createModelOpen = ref(false);
+
+const deleteDataSource = (ds: DataSource) => {
+  dialog.create({
+    title: 'Confirm deletion',
+    content: `Are you sure, you want to delete the data source ${ds.name}?`,
+    negativeText: 'Cancel',
+    positiveText: 'Sure',
+    closable: false,
+    showIcon: false,
+    bordered: true,
+
+    onPositiveClick: () => {
+      dataSources.deleteDataSource(ds);
+    },
+  });
+};
+
+const handleShow = (ds: DataSource) => {
+  router.push(`/data-sources/${ds.name}`);
+};
 </script>
