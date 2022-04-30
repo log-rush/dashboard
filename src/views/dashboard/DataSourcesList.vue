@@ -84,7 +84,7 @@ const webSocketState: Record<number, Status> = {
 };
 
 const getState = (dsId: string): Status =>
-  webSocketState[dataSourcesStore.connections[dsId].state];
+  webSocketState[dataSourcesStore.rawDataSources[dsId].connection.state];
 
 const deleteDataSource = (ds: DataSource) => {
   dialog.create({

@@ -7,16 +7,22 @@ enum Keys {
   DataSources = '&ds',
 }
 
-const dataSources: Record<string, DataSource> = reactive({});
-const connections: Record<string, UnwrapRef<Socket>> = reactive({});
+type DataSourceRecord = DataSource & {
+  connection: UnwrapRef<Socket>;
+};
+
+const createConnection = (dataSource: DataSource): UnwrapRef<Socket> =>
+  reactive(new Socket(dataSource.url.split('://')[1], 10, 1_000));
+
+const dataSources: Record<string, DataSourceRecord> = reactive({});
 
 const createDataSource = async (url: string): Promise<boolean> => {
   const dataSource = await DataSourcesService.getDataSource(url);
   if (dataSource) {
-    dataSources[dataSource.id] = dataSource;
-    connections[dataSource.id] = reactive(
-      new Socket(dataSource.url.split('://')[1], 10, 1_000),
-    );
+    dataSources[dataSource.id] = {
+      ...dataSource,
+      connection: createConnection(dataSource),
+    };
     return true;
   }
   return false;
@@ -25,8 +31,7 @@ const createDataSource = async (url: string): Promise<boolean> => {
 const deleteDataSource = (dataSource: DataSource) => {
   const ds = dataSources[dataSource.id];
   if (ds) {
-    connections[ds.id].close();
-    delete connections[ds.id];
+    dataSources[ds.id].connection.close();
     delete dataSources[ds.id];
   }
 };
@@ -35,12 +40,14 @@ watch(dataSources, (ds) => {
   localStorage.setItem(
     Keys.DataSources,
     JSON.stringify(
-      Object.values(ds).map((ds) => ({
-        id: ds.id,
-        name: ds.name,
-        url: ds.url,
-        version: ds.version,
-      })),
+      Object.values(ds).map(
+        (ds): DataSource => ({
+          id: ds.id,
+          name: ds.name,
+          url: ds.url,
+          version: ds.version,
+        }),
+      ),
     ),
   );
 });
@@ -54,10 +61,10 @@ const init = async () => {
     >[];
 
     for (const ds of parsedDataSources) {
-      dataSources[ds.id] = { ...ds };
-      connections[ds.id] = reactive(
-        new Socket(ds.url.split('://')[1], 10, 1_000),
-      );
+      dataSources[ds.id] = {
+        ...ds,
+        connection: createConnection(ds),
+      };
     }
   }
 };
@@ -65,8 +72,7 @@ init();
 
 const Store = {
   allDataSources: computed(() => Object.values(dataSources)),
-  dataSources,
-  connections,
+  rawDataSources: dataSources,
   createDataSource,
   deleteDataSource,
 };
