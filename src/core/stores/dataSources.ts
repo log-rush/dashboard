@@ -40,6 +40,9 @@ const deleteDataSource = (dataSource: DataSource) => {
   }
 };
 
+const getDataSource = (id: string): DataSourceRecord | undefined =>
+  dataSources[id];
+
 watch(dataSources, (ds) => {
   localStorage.setItem(
     Keys.DataSources,
@@ -65,6 +68,17 @@ const init = async () => {
     >[];
 
     for (const ds of parsedDataSources) {
+      DataSourcesService.getDataSource(ds.url).then((fetchedDataSource) => {
+        if (fetchedDataSource) {
+          if (fetchedDataSource.id !== ds.id) {
+            deleteDataSource(ds);
+            createDataSource(fetchedDataSource.url);
+          } else {
+            dataSources[ds.id].name = fetchedDataSource.name;
+            dataSources[ds.id].version = fetchedDataSource.version;
+          }
+        }
+      });
       dataSources[ds.id] = {
         ...ds,
         connection: createConnection(ds),
@@ -79,6 +93,7 @@ const Store = {
   rawDataSources: dataSources,
   createDataSource,
   deleteDataSource,
+  getDataSource,
 };
 
 export const useDataSources = (): typeof Store => Store;
