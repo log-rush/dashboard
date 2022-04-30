@@ -72,7 +72,11 @@ const rules: FormRules = {
     validator: (_rule: FormItemRule, value: string) => {
       if (!value) {
         return new Error('The url is required');
-      } else if (!/^http(s?):\/\/.*\..*\/$/.test(value)) {
+      } else if (
+        !/^http(s?):\/\/(localhost|(\d{1,3}\.){3}\d{1,3}|(.*\.)?(.*)\.(.*))(:\d{1,5})?\/$/.test(
+          value,
+        )
+      ) {
         return new Error(
           'The url should follow the schema http(s?)://<your-domain>/',
         );
