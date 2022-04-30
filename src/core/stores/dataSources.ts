@@ -1,5 +1,5 @@
 import { computed, reactive, UnwrapRef, watch } from 'vue';
-import { Socket } from '../api/ws/socket';
+import { DataSourceConnection } from '../services/DataSourceConnection';
 import { DataSource } from '../model/dataSource';
 import { DataSourcesService } from '../services/dataSourceService';
 
@@ -8,11 +8,15 @@ enum Keys {
 }
 
 type DataSourceRecord = DataSource & {
-  connection: UnwrapRef<Socket>;
+  connection: UnwrapRef<DataSourceConnection>;
 };
 
-const createConnection = (dataSource: DataSource): UnwrapRef<Socket> =>
-  reactive(new Socket(dataSource.url.split('://')[1], 10, 1_000));
+const createConnection = (
+  dataSource: DataSource,
+): UnwrapRef<DataSourceConnection> =>
+  reactive(
+    new DataSourceConnection(dataSource.id, dataSource.url.split('://')[1]),
+  );
 
 const dataSources: Record<string, DataSourceRecord> = reactive({});
 

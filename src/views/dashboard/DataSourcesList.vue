@@ -17,7 +17,7 @@
             </n-thing>
             <template #suffix>
               <n-space justify="end" align="center" :wrap="false">
-                <Status :status="getState(dataSource.id)" />
+                <Status :status="getStatus(dataSource.id)" />
                 <n-button @click="deleteDataSource(dataSource)"
                   >Delete</n-button
                 >
@@ -66,7 +66,7 @@ import PageLayout from '@/components/util/PageLayout.vue';
 import CreateDataSource from '@/components/dataSources/modals/CreateDataSource.vue';
 import { ref } from 'vue';
 import { useDataSources } from '@/core/stores/dataSources';
-import { DataSource, ConnectionStatus } from '@/core/model/dataSource';
+import { DataSource } from '@/core/model/dataSource';
 import { useRouter } from 'vue-router';
 import Status from '@/components/util/Status.vue';
 
@@ -76,15 +76,8 @@ const router = useRouter();
 const allDataSources = dataSourcesStore.allDataSources;
 const createModelOpen = ref(false);
 
-const webSocketState: Record<number, ConnectionStatus> = {
-  [WebSocket.OPEN]: 'connected',
-  [WebSocket.CLOSED]: 'disconnected',
-  [WebSocket.CONNECTING]: 'connecting',
-  [WebSocket.CLOSING]: 'disconnected',
-};
-
-const getState = (dsId: string): ConnectionStatus =>
-  webSocketState[dataSourcesStore.rawDataSources[dsId].connection.state];
+const getStatus = (id: string) =>
+  dataSourcesStore.rawDataSources[id].connection.state;
 
 const deleteDataSource = (ds: DataSource) => {
   dialog.create({
