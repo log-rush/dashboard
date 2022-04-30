@@ -44,8 +44,7 @@ export class DataSourceConnection {
   }
 
   private reconnect() {
-    console.log('reconnecting');
-    if (this.retryAttempts < 0 && this.isReconnecting) {
+    if (this.retryAttempts < 0 || this.isReconnecting) {
       return;
     }
     this.retryAttempts--;
