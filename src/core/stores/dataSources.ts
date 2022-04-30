@@ -1,5 +1,5 @@
-import { computed, watch } from 'vue';
-import { DataSourceEntity } from '../entities/DataSourceEntity';
+import { computed, reactive, UnwrapRef, watch } from 'vue';
+import { Socket } from '../api/ws/socket';
 import { DataSource } from '../model/dataSource';
 import { DataSourcesService } from '../services/dataSourceService';
 
@@ -7,15 +7,15 @@ enum Keys {
   DataSources = '&ds',
 }
 
-const dataSources: Record<string, DataSourceEntity> = {};
+const dataSources: Record<string, DataSource> = reactive({});
+const connections: Record<string, UnwrapRef<Socket>> = reactive({});
 
 const createDataSource = async (url: string): Promise<boolean> => {
   const dataSource = await DataSourcesService.getDataSource(url);
   if (dataSource) {
-    dataSources[dataSource.id] = new DataSourceEntity(
-      dataSource.id,
-      dataSource.url,
-      dataSource.name,
+    dataSources[dataSource.id] = dataSource;
+    connections[dataSource.id] = reactive(
+      new Socket(dataSource.url.split('://')[1], 10, 1_000),
     );
     return true;
   }
@@ -25,25 +25,25 @@ const createDataSource = async (url: string): Promise<boolean> => {
 const deleteDataSource = (dataSource: DataSource) => {
   const ds = dataSources[dataSource.id];
   if (ds) {
-    ds.close();
+    connections[ds.id].close();
+    delete connections[ds.id];
     delete dataSources[ds.id];
   }
 };
 
-watch(
-  () => dataSources,
-  (ds) => {
-    localStorage.setItem(
-      Keys.DataSources,
-      JSON.stringify(
-        Object.values(ds).map((ds: Partial<DataSource>) => {
-          delete ds['isConnected'];
-          return ds;
-        }),
-      ),
-    );
-  },
-);
+watch(dataSources, (ds) => {
+  localStorage.setItem(
+    Keys.DataSources,
+    JSON.stringify(
+      Object.values(ds).map((ds) => ({
+        id: ds.id,
+        name: ds.name,
+        url: ds.url,
+        version: ds.version,
+      })),
+    ),
+  );
+});
 
 const init = async () => {
   const storedSources = localStorage.getItem(Keys.DataSources);
@@ -54,14 +54,19 @@ const init = async () => {
     >[];
 
     for (const ds of parsedDataSources) {
-      dataSources[ds.id] = new DataSourceEntity(ds.id, ds.url, ds.name);
+      dataSources[ds.id] = { ...ds };
+      connections[ds.id] = reactive(
+        new Socket(ds.url.split('://')[1], 10, 1_000),
+      );
     }
   }
 };
 init();
 
 const Store = {
-  dataSources: computed(() => Object.values(dataSources)),
+  allDataSources: computed(() => Object.values(dataSources)),
+  dataSources,
+  connections,
   createDataSource,
   deleteDataSource,
 };

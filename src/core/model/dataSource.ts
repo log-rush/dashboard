@@ -3,5 +3,11 @@ export type DataSource = {
   url: string;
   name: string;
   version: string;
-  isConnected: boolean;
 };
+
+export type Status =
+  | 'disconnected'
+  | 'connecting'
+  | 'connected'
+  | 'error'
+  | 'warn';

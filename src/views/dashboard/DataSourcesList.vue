@@ -17,11 +17,7 @@
             </n-thing>
             <template #suffix>
               <n-space justify="end" align="center" :wrap="false">
-                <Status
-                  :status="
-                    dataSource.isConnected ? 'connected' : 'disconnected'
-                  "
-                />
+                <StatusIndicator :status="getState(dataSource.id)" />
                 <n-button @click="deleteDataSource(dataSource)"
                   >Delete</n-button
                 >
@@ -68,17 +64,27 @@ import {
 } from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
 import CreateDataSource from '@/components/dataSources/modals/CreateDataSource.vue';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { useDataSources } from '@/core/stores/dataSources';
-import { DataSource } from '@/core/model/dataSource';
+import { DataSource, Status } from '@/core/model/dataSource';
 import { useRouter } from 'vue-router';
-import Status from '@/components/util/Status.vue';
+import StatusIndicator from '@/components/util/Status.vue';
 
-const dataSources = useDataSources();
+const dataSourcesStore = useDataSources();
 const dialog = useDialog();
 const router = useRouter();
-const allDataSources = computed(() => dataSources.dataSources.value);
+const allDataSources = dataSourcesStore.allDataSources;
 const createModelOpen = ref(false);
+
+const webSocketState: Record<number, Status> = {
+  [WebSocket.OPEN]: 'connected',
+  [WebSocket.CLOSED]: 'disconnected',
+  [WebSocket.CONNECTING]: 'connecting',
+  [WebSocket.CLOSING]: 'disconnected',
+};
+
+const getState = (dsId: string): Status =>
+  webSocketState[dataSourcesStore.connections[dsId].state];
 
 const deleteDataSource = (ds: DataSource) => {
   dialog.create({
@@ -91,7 +97,7 @@ const deleteDataSource = (ds: DataSource) => {
     bordered: true,
 
     onPositiveClick: () => {
-      dataSources.deleteDataSource(ds);
+      dataSourcesStore.deleteDataSource(ds);
     },
   });
 };

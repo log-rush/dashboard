@@ -19,7 +19,6 @@ export const LogRushHttpApi = {
         url: url,
         name: res.name,
         version: res.version,
-        isConnected: false,
       };
     } catch (e: unknown) {
       return undefined;
