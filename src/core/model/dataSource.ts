@@ -5,7 +5,7 @@ export type DataSource = {
   version: string;
 };
 
-export type Status =
+export type ConnectionStatus =
   | 'disconnected'
   | 'connecting'
   | 'connected'

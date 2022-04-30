@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { defineProps } from 'vue';
 import { NSpace, NSpin, useThemeVars } from 'naive-ui';
-import { Status } from '@/core/model/dataSource';
+import { ConnectionStatus } from '@/core/model/dataSource';
 const theme = useThemeVars();
 const colors = {
   connected: theme.value.successColor,
@@ -29,7 +29,7 @@ const colors = {
   error: theme.value.errorColor,
 };
 defineProps<{
-  status: Status;
+  status: ConnectionStatus;
 }>();
 </script>
 
