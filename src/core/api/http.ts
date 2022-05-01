@@ -24,9 +24,9 @@ export const LogRushHttpApi = {
       return undefined;
     }
   },
-  async getAllStreams(dataSource: DataSource): Promise<LogStream[]> {
+  async getAllStreams(url: string): Promise<LogStream[]> {
     try {
-      const req = await fetch(`${dataSource.url}streams`);
+      const req = await fetch(`${url}streams`);
       if (req.status !== 200) {
         return [];
       }
@@ -37,11 +37,11 @@ export const LogRushHttpApi = {
     }
   },
   async getStream(
-    dataSource: DataSource,
+    url: string,
     streamId: string,
   ): Promise<LogStream | undefined> {
     try {
-      const req = await fetch(`${dataSource.url}stream/${streamId}`);
+      const req = await fetch(`${url}stream/${streamId}`);
       if (req.status !== 200) {
         return undefined;
       }

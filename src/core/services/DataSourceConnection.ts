@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { Ref, ref } from 'vue';
 import { Socket } from '../api/ws/socket';
 import { ConnectionStatus } from '../model/dataSource';
 
@@ -18,8 +18,10 @@ export class DataSourceConnection {
   }
 
   public close() {
-    this.connection.close();
-    this.state.value = 'disconnected';
+    if (this.connection.state === WebSocket.OPEN) {
+      this.state = 'disconnected' as unknown as Ref<ConnectionStatus>;
+      this.connection.close();
+    }
   }
 
   private setupSocket() {

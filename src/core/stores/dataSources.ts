@@ -21,7 +21,9 @@ const createConnection = (
 const dataSources: Record<string, DataSourceRecord> = reactive({});
 
 const createDataSource = async (url: string): Promise<boolean> => {
-  const dataSource = await DataSourcesService.getDataSource(url);
+  const dataSource = await DataSourcesService.getDataSource({
+    url,
+  } as DataSource);
   if (dataSource) {
     dataSources[dataSource.id] = {
       ...dataSource,
@@ -68,11 +70,11 @@ const init = async () => {
     >[];
 
     for (const ds of parsedDataSources) {
-      DataSourcesService.getDataSource(ds.url).then((fetchedDataSource) => {
+      DataSourcesService.getDataSource(ds).then((fetchedDataSource) => {
         if (fetchedDataSource) {
           if (fetchedDataSource.id !== ds.id) {
-            deleteDataSource(ds);
-            createDataSource(fetchedDataSource.url);
+            // deleteDataSource(ds);
+            // createDataSource(fetchedDataSource.url);
           } else {
             dataSources[ds.id].name = fetchedDataSource.name;
             dataSources[ds.id].version = fetchedDataSource.version;

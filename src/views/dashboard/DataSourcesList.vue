@@ -77,7 +77,7 @@ const allDataSources = dataSourcesStore.allDataSources;
 const createModelOpen = ref(false);
 
 const getStatus = (id: string) =>
-  dataSourcesStore.rawDataSources[id].connection.state;
+  dataSourcesStore.rawDataSources[id]?.connection.state;
 
 const deleteDataSource = (ds: DataSource) => {
   dialog.create({
