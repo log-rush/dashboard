@@ -1,4 +1,4 @@
-import { Ref, ref } from 'vue';
+import { ref } from 'vue';
 import { Socket } from '../api/ws/socket';
 import { ConnectionStatus } from '../model/dataSource';
 
@@ -9,6 +9,7 @@ export class DataSourceConnection {
   private connection: Socket;
   private retryAttempts = 10;
   private isReconnecting = false;
+  private shouldReconnect = true;
   public state = ref<ConnectionStatus>('disconnected');
 
   constructor(public readonly id: string, public readonly domain: string) {
@@ -19,13 +20,13 @@ export class DataSourceConnection {
 
   public close() {
     if (this.connection.state === WebSocket.OPEN) {
-      this.state = 'disconnected' as unknown as Ref<ConnectionStatus>;
+      this.shouldReconnect = false;
       this.connection.close();
     }
   }
 
   private setupSocket() {
-    this.connection.onClose(() => this.reconnect());
+    this.connection.onClose(() => this.handleClose());
     this.connection.onError(() => this.handleError());
     this.connection.onOpen(() => this.handleOpen());
     this.connection.onMessage((evt) => this.handleMessage(evt));
@@ -45,8 +46,17 @@ export class DataSourceConnection {
     this.reconnect();
   }
 
+  private handleClose() {
+    this.state.value = 'disconnected';
+    this.reconnect();
+  }
+
   private reconnect() {
-    if (this.retryAttempts < 0 || this.isReconnecting) {
+    if (
+      this.retryAttempts < 0 ||
+      this.isReconnecting ||
+      !this.shouldReconnect
+    ) {
       return;
     }
     this.retryAttempts--;
