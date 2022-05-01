@@ -51,11 +51,13 @@
 <script setup lang="ts">
 import { NLayout, NLayoutSider, NMenu } from 'naive-ui';
 import type { MenuOption } from 'naive-ui';
-import { h, onMounted, ref, VNode, watch } from 'vue';
+import { computed, h, onMounted, ref, VNode, watch } from 'vue';
 import { IconRenderer, CreateIconRenderer } from '@/components/Icon';
 import { RouterLink, useRoute } from 'vue-router';
+import { useDataSources } from '@/core/stores/dataSources';
 
 const route = useRoute();
+const dataSourcesStore = useDataSources();
 const collapsed = ref(true);
 const selectedValue = ref<string | undefined>(undefined);
 
@@ -106,26 +108,22 @@ const MainMenu: MenuOption[] = [
   },
 ];
 
-const DataSourceMenu: MenuOption[] = [
-  {
-    label: 'Data Sources',
-    key: 'data-sources',
-    icon: () => IconRenderer('mdi:server'),
-    href: '/data-sources',
-    children: [
+const DataSourceMenu = computed(
+  () =>
+    [
       {
-        label: 'a-1',
-        href: '/data-sources/a-1',
-        key: 'a-1',
+        label: 'Data Sources',
+        key: 'data-sources',
+        icon: () => IconRenderer('mdi:server'),
+        href: '/data-sources',
+        children: dataSourcesStore.allDataSources.value.map((ds) => ({
+          label: ds.name,
+          href: `/data-sources/${ds.id}`,
+          key: ds.id,
+        })),
       },
-      {
-        label: 'b-1',
-        href: '/data-sources/b-1',
-        key: 'b-1',
-      },
-    ],
-  },
-];
+    ] as MenuOption[],
+);
 
 const ViewsMenu: MenuOption[] = [
   {
