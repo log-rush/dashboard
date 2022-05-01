@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { Socket } from '../api/ws/socket';
 import { ConnectionStatus } from '../model/dataSource';
+import { LRPCoder, LRPOperation } from './LRPCoder';
 
 export class DataSourceConnection {
   private reconnectTimeout = 3_000;
@@ -25,6 +26,32 @@ export class DataSourceConnection {
     }
   }
 
+  public subscribe(streamId: string) {
+    this.send(
+      LRPCoder.encode({
+        operation: LRPOperation.OprSubscribe,
+        payload: streamId,
+      }),
+    );
+  }
+
+  public unsubscribe(streamId: string) {
+    this.send(
+      LRPCoder.encode({
+        operation: LRPOperation.OprUnsubscribe,
+        payload: streamId,
+      }),
+    );
+  }
+
+  private send(msg: string) {
+    if (this.connection.state === WebSocket.OPEN) {
+      this.connection.send(msg);
+    } else {
+      console.warn('could not send (%s)', msg);
+    }
+  }
+
   private setupSocket() {
     this.connection.onClose(() => this.handleClose());
     this.connection.onError(() => this.handleError());
@@ -33,7 +60,18 @@ export class DataSourceConnection {
   }
 
   private handleMessage(evt: MessageEvent) {
-    console.log(evt.data);
+    const message = LRPCoder.decode(evt.data);
+    console.log(message);
+
+    if (!message) return;
+    if (message.operation === LRPOperation.OprStillAlive) {
+      console.log('alive test');
+      this.connection.send(
+        LRPCoder.encode({ operation: LRPOperation.OprAlive, payload: '' }),
+      );
+    } else if (message.operation === LRPOperation.OprErr) {
+      console.warn('lrp error:', message.payload);
+    }
   }
 
   private handleOpen() {
