@@ -19,10 +19,11 @@ type StoredLogStream = Omit<Omit<LogStreamRecord, 'fromCache'>, 'status'>;
 const logStreams: Record<string, LogStreamRecord[]> = reactive({});
 
 const getStreamsFrom = async (dsId: string): Promise<LogStream[]> => {
-  const cached = logStreams[dsId];
-  if (cached) {
-    return cached;
-  }
+  // TODO: store state of streams
+  // const cached = logStreams[dsId];
+  // if (cached) {
+  //   return cached;
+  // }
   const ds = useDataSources().getDataSource(dsId);
   if (!ds) {
     return [];

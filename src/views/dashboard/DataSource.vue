@@ -36,7 +36,7 @@
           <Status :status="getStatus(dataSource?.id)" />
           <n-button @click="deleteDataSource(dataSource)">Delete</n-button>
         </n-space>
-        <n-button ghost>Refresh</n-button>
+        <n-button ghost @click="refresh()">Refresh</n-button>
       </n-space>
     </template>
   </page-layout>
@@ -101,5 +101,13 @@ const deleteDataSource = (ds: DataSource | undefined) => {
       router.push('/data-sources');
     },
   });
+};
+
+const refresh = async () => {
+  if (dataSource.value) {
+    logStreams.value = await logStreamStore.logStreamsForDataSource(
+      dataSource.value.id,
+    );
+  }
 };
 </script>
