@@ -16,6 +16,7 @@
             <template #suffix>
               <n-space justify="end" align="center" :wrap="false">
                 <n-button>Subscribe</n-button>
+                <n-button @click="logPeekOpen = stream.id">Show Logs</n-button>
               </n-space>
             </template>
           </n-list-item>
@@ -29,7 +30,10 @@
         </n-empty>
       </n-space>
     </n-space>
-
+    <LogPeekModal
+      :is-open="logPeekOpen !== undefined"
+      @close="logPeekOpen = undefined"
+    />
     <template #extra>
       <n-space>
         <n-space justify="end" align="center" :wrap="false">
@@ -61,6 +65,7 @@ import Status from '@/components/util/Status.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { LogStream } from '@/core/model/logStream';
 import { useLogStreams } from '@/core/stores/streams';
+import LogPeekModal from '@/components/streams/modals/LogPeekModal.vue';
 
 const dataSourcesStore = useDataSources();
 const logStreamStore = useLogStreams();
@@ -69,6 +74,7 @@ const route = useRoute();
 const router = useRouter();
 const dataSource = ref<DataSource | undefined>(undefined);
 const logStreams = ref<LogStream[]>([]);
+const logPeekOpen = ref<string | undefined>(undefined);
 
 onMounted(async () => {
   const id = route.params['id'] as string;
