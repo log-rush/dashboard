@@ -1,22 +1,7 @@
-import { reactive, watch } from 'vue';
-import { ConnectionStatus } from '../model/dataSource';
 import { DataSourcesService } from '../services/dataSourceService';
 import { LogStream } from '../model/stream';
 import { useDataSources } from './dataSources';
-
-enum Keys {
-  Streams = '&ls',
-}
-
-type LogStreamRecord = LogStream & {
-  status: ConnectionStatus;
-  isSubscribed: boolean;
-  fromCache: boolean;
-};
-
-type StoredLogStream = Omit<Omit<LogStreamRecord, 'fromCache'>, 'status'>;
-
-const logStreams: Record<string, LogStreamRecord[]> = reactive({});
+import { StorageKeys, useRootState } from './root';
 
 const getStreamsFrom = async (dsId: string): Promise<LogStream[]> => {
   // TODO: store state of streams
@@ -24,45 +9,31 @@ const getStreamsFrom = async (dsId: string): Promise<LogStream[]> => {
   // if (cached) {
   //   return cached;
   // }
+  const { logStreams, save } = useRootState();
   const ds = useDataSources().getDataSource(dsId);
   if (!ds) {
     return [];
   }
-  const streams = await DataSourcesService.getStreams(ds);
-  logStreams[dsId] = streams.map((stream) => ({
-    ...stream,
-    status: 'connected',
-    isSubscribed: false,
-    fromCache: false,
-  }));
-  return streams;
+  const streams = await DataSourcesService.getStreams(ds.url);
+  const convertedStreams: LogStream[] = [];
+  for (const stream of streams) {
+    logStreams[stream.id] = {
+      ...stream,
+      dataSource: dsId,
+      status: 'disconnected',
+      isSubscribed: false,
+      fromCache: false,
+    };
+    convertedStreams.push(logStreams[stream.id]);
+  }
+  save();
+  return convertedStreams;
 };
 
-watch(logStreams, (ls) => {
-  localStorage.setItem(
-    Keys.Streams,
-    JSON.stringify(
-      Object.entries(ls).map(([key, logStream]) => ({
-        [key]: logStream.map(
-          (ls): StoredLogStream => ({
-            id: ls.id,
-            alias: ls.alias,
-            isSubscribed: ls.isSubscribed,
-          }),
-        ),
-      })),
-    ),
-  );
-});
-
 const init = async () => {
-  const storedStreams = localStorage.getItem(Keys.Streams);
+  const storedStreams = localStorage.getItem(StorageKeys.Streams);
   if (storedStreams) {
-    const parsedLogStreams = JSON.parse(storedStreams) as Record<
-      string,
-      StoredLogStream[]
-    >;
-
+    const parsedLogStreams = JSON.parse(storedStreams);
     for (const [id, ls] of Object.entries(parsedLogStreams)) {
       // TODO: fetch current state
       // logStreams[id] = ls.map((ls) => ({
@@ -77,7 +48,6 @@ init();
 
 const Store = {
   logStreamsForDataSource: getStreamsFrom,
-  rawLogStreams: logStreams,
 };
 
 export const useLogStreams = (): typeof Store => Store;

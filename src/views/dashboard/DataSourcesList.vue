@@ -18,10 +18,11 @@
             <template #suffix>
               <n-space justify="end" align="center" :wrap="false">
                 <Status :status="getStatus(dataSource.id)" />
-                <n-button @click="deleteDataSource(dataSource)"
+                <n-button
+                  @click="deleteDataSource(dataSource.id, dataSource.name)"
                   >Delete</n-button
                 >
-                <n-button @click="handleShow(dataSource)">Show</n-button>
+                <n-button @click="handleShow(dataSource.id)">Show</n-button>
               </n-space>
             </template>
           </n-list-item>
@@ -66,7 +67,6 @@ import PageLayout from '@/components/util/PageLayout.vue';
 import CreateDataSource from '@/components/dataSources/modals/CreateDataSource.vue';
 import { ref } from 'vue';
 import { useDataSources } from '@/core/stores/dataSources';
-import { DataSource } from '@/core/model/dataSource';
 import { useRouter } from 'vue-router';
 import Status from '@/components/util/Status.vue';
 
@@ -77,12 +77,12 @@ const allDataSources = dataSourcesStore.allDataSources;
 const createModelOpen = ref(false);
 
 const getStatus = (id: string) =>
-  dataSourcesStore.rawDataSources[id]?.connection.state;
+  dataSourcesStore.getDataSource(id)?.status ?? 'warn';
 
-const deleteDataSource = (ds: DataSource) => {
+const deleteDataSource = (id: string, name: string) => {
   dialog.create({
     title: 'Confirm deletion',
-    content: `Are you sure, you want to delete the data source ${ds.name}?`,
+    content: `Are you sure, you want to delete the data source ${name}?`,
     negativeText: 'Cancel',
     positiveText: 'Sure',
     closable: false,
@@ -90,12 +90,12 @@ const deleteDataSource = (ds: DataSource) => {
     bordered: true,
 
     onPositiveClick: () => {
-      dataSourcesStore.deleteDataSource(ds);
+      dataSourcesStore.deleteDataSource(id);
     },
   });
 };
 
-const handleShow = (ds: DataSource) => {
-  router.push(`/data-sources/${ds.id}`);
+const handleShow = (id: string) => {
+  router.push(`/data-sources/${id}`);
 };
 </script>

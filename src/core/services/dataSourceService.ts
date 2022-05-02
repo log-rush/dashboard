@@ -1,12 +1,16 @@
 import { LogRushHttpApi } from '../api/http';
-import { DataSource } from '../model/dataSource';
-import { LogStream } from '../model/stream';
+import {
+  DataSourceInfoResponse,
+  LogStreamResponse,
+} from '../model/api/httpTypes';
 
 export const DataSourcesService = {
-  async getDataSource(ds: DataSource): Promise<DataSource | undefined> {
-    return await LogRushHttpApi.getDataSource(ds.url);
+  async getDataSource(
+    dsUrl: string,
+  ): Promise<DataSourceInfoResponse | undefined> {
+    return await LogRushHttpApi.getDataSource(dsUrl);
   },
-  async getStreams(ds: DataSource): Promise<LogStream[]> {
-    return await LogRushHttpApi.getAllStreams(ds.url);
+  async getStreams(dsUrl: string): Promise<LogStreamResponse[]> {
+    return await LogRushHttpApi.getAllStreams(dsUrl);
   },
 };

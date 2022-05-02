@@ -63,9 +63,9 @@ import { useDataSources } from '@/core/stores/dataSources';
 import { ConnectionStatus, DataSource } from '@/core/model/dataSource';
 import Status from '@/components/util/Status.vue';
 import { useRoute, useRouter } from 'vue-router';
-import { LogStream } from '@/core/model/logStream';
 import { useLogStreams } from '@/core/stores/streams';
 import LogPeekModal from '@/components/streams/modals/LogPeekModal.vue';
+import { LogStream } from '@/core/model/stream';
 
 const dataSourcesStore = useDataSources();
 const logStreamStore = useLogStreams();
@@ -86,7 +86,7 @@ onMounted(async () => {
 
 const getStatus = (id: string | undefined): ConnectionStatus => {
   if (id) {
-    return dataSourcesStore.rawDataSources[id]?.connection.state;
+    return dataSourcesStore.getDataSource(id)?.status ?? 'warn';
   }
   return 'disconnected';
 };
@@ -103,7 +103,7 @@ const deleteDataSource = (ds: DataSource | undefined) => {
     bordered: true,
 
     onPositiveClick: () => {
-      dataSourcesStore.deleteDataSource(ds);
+      dataSourcesStore.deleteDataSource(ds.id);
       router.push('/data-sources');
     },
   });

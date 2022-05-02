@@ -1,13 +1,13 @@
-import { DataSource } from '../model/dataSource';
 import {
   DataSourceInfoResponse,
   LogStreamResponse,
   LogStreamsListResponse,
 } from '../model/api/httpTypes';
-import { LogStream } from '../model/stream';
 
 export const LogRushHttpApi = {
-  async getDataSource(url: string): Promise<DataSource | undefined> {
+  async getDataSource(
+    url: string,
+  ): Promise<DataSourceInfoResponse | undefined> {
     try {
       const req = await fetch(`${url}info`);
       if (req.status !== 200) {
@@ -16,7 +16,6 @@ export const LogRushHttpApi = {
       const res: DataSourceInfoResponse = await req.json();
       return {
         id: res.id,
-        url: url,
         name: res.name,
         version: res.version,
       };
@@ -24,7 +23,7 @@ export const LogRushHttpApi = {
       return undefined;
     }
   },
-  async getAllStreams(url: string): Promise<LogStream[]> {
+  async getAllStreams(url: string): Promise<LogStreamResponse[]> {
     try {
       const req = await fetch(`${url}streams`);
       if (req.status !== 200) {
@@ -39,7 +38,7 @@ export const LogRushHttpApi = {
   async getStream(
     url: string,
     streamId: string,
-  ): Promise<LogStream | undefined> {
+  ): Promise<LogStreamResponse | undefined> {
     try {
       const req = await fetch(`${url}stream/${streamId}`);
       if (req.status !== 200) {
