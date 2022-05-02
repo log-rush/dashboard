@@ -1,5 +1,5 @@
 <template>
-  <n-modal :show="isOpen" transform-origin="center">
+  <n-modal :show="stream !== undefined" transform-origin="center">
     <n-card
       style="max-width: 600px"
       title="View Logs of xxx"
@@ -13,19 +13,34 @@
           Close
         </n-button>
       </template>
+      <n-log :rows="rows" :log="logs"></n-log>
     </n-card>
   </n-modal>
 </template>
 
 <script setup lang="ts">
-import { NModal, NCard, NButton } from 'naive-ui';
-import { defineProps, defineEmits } from 'vue';
+import { useRootState } from '@/core/stores/root';
+import { NModal, NCard, NButton, NLog } from 'naive-ui';
+import { defineProps, defineEmits, computed, toRefs } from 'vue';
 
-defineProps<{
-  isOpen: boolean;
+const rootState = useRootState();
+
+const props = defineProps<{
+  stream?: string;
 }>();
+
+const { stream } = toRefs(props);
 
 const emit = defineEmits<{
   (event: 'close'): void;
 }>();
+
+const logs = computed(() =>
+  (rootState.rootState.logs[stream?.value ?? ''] ?? [])
+    .map((l) => l.message)
+    .join('\n'),
+);
+const rows = computed(
+  () => (rootState.rootState.logs[stream?.value ?? ''] ?? []).length,
+);
 </script>

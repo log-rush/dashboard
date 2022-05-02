@@ -3,12 +3,16 @@ import { DataSourceConnection } from '../services/DataSourceConnection';
 import { DataSource, StoredDataSource } from '../model/dataSource';
 import { DataSourcesService } from '../services/dataSourceService';
 import { StorageKeys, useRootState } from './root';
+import { Log } from '../model/Log';
 
 const createConnection = (
   id: string,
   url: string,
-): UnwrapRef<DataSourceConnection> =>
-  reactive(new DataSourceConnection(id, url.split('://')[1]));
+): UnwrapRef<DataSourceConnection> => {
+  const connection = new DataSourceConnection(id, url.split('://')[1]);
+  connection.setLogHandler(logHandler);
+  return reactive(connection);
+};
 
 const createDataSource = async (url: string): Promise<boolean> => {
   const dataSource = await DataSourcesService.getDataSource(url);
@@ -44,6 +48,23 @@ const getDataSource = (id: string | undefined): DataSource | undefined => {
   });
 };
 
+const subscribeToStream = (ofDataSourceId: string, stream: string) => {
+  const ds = useRootState().dataSources[ofDataSourceId ?? ''];
+  if (!ds) return;
+  ds.connection.subscribe(stream);
+};
+
+const unsubscribeFromStream = (ofDataSourceId: string, stream: string) => {
+  const ds = useRootState().dataSources[ofDataSourceId ?? ''];
+  if (!ds) return;
+  ds.connection.unsubscribe(stream);
+};
+
+const rootStateRef = useRootState().rootState;
+const logHandler = (stream: string, log: Log) => {
+  rootStateRef.logs[stream].push(log);
+};
+
 const init = async () => {
   const { dataSources, save } = useRootState();
   const storedSources = localStorage.getItem(StorageKeys.DataSources);
@@ -77,6 +98,8 @@ const Store = {
   createDataSource,
   deleteDataSource,
   getDataSource,
+  subscribeToStream,
+  unsubscribeFromStream,
 };
 
 export const useDataSources = (): typeof Store => Store;

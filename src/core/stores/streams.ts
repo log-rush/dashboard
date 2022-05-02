@@ -9,7 +9,7 @@ const getStreamsFrom = async (dsId: string): Promise<LogStream[]> => {
   // if (cached) {
   //   return cached;
   // }
-  const { logStreams, save } = useRootState();
+  const { logStreams, rootState } = useRootState();
   const ds = useDataSources().getDataSource(dsId);
   if (!ds) {
     return [];
@@ -24,9 +24,9 @@ const getStreamsFrom = async (dsId: string): Promise<LogStream[]> => {
       isSubscribed: false,
       fromCache: false,
     };
+    rootState.logs[stream.id] = [];
     convertedStreams.push(logStreams[stream.id]);
   }
-  save();
   return convertedStreams;
 };
 

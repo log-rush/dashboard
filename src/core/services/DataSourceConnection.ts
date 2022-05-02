@@ -1,6 +1,7 @@
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Socket } from '../api/ws/socket';
 import { ConnectionStatus } from '../model/dataSource';
+import { Log } from '../model/Log';
 import { LRPCoder, LRPOperation } from './LRPCoder';
 
 export class DataSourceConnection {
@@ -12,6 +13,9 @@ export class DataSourceConnection {
   private isReconnecting = false;
   private shouldReconnect = true;
   public state = ref<ConnectionStatus>('disconnected');
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  private logHandler: (stream: string, log: Log) => void = () => {};
 
   constructor(public readonly id: string, public readonly domain: string) {
     this.state.value = 'connecting';
@@ -44,6 +48,10 @@ export class DataSourceConnection {
     );
   }
 
+  public setLogHandler(handler: (stream: string, log: Log) => void) {
+    this.logHandler = handler;
+  }
+
   private send(msg: string) {
     if (this.connection.state === WebSocket.OPEN) {
       this.connection.send(msg);
@@ -71,7 +79,17 @@ export class DataSourceConnection {
       );
     } else if (message.operation === LRPOperation.OprErr) {
       console.warn('lrp error:', message.payload);
+    } else if (message.operation === LRPOperation.OprLog) {
+      this.handleLog(message.payload);
     }
+  }
+
+  private handleLog(msg: string) {
+    const [stream, timestamp, ...message] = msg.split(',');
+    this.logHandler(stream, {
+      message: message.join(','),
+      timestamp: parseInt(timestamp, 10) ?? 0,
+    });
   }
 
   private handleOpen() {

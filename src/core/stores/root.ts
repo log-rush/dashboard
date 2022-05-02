@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
 import { DataSourceRecord, StoredDataSource } from '../model/dataSource';
+import { Log } from '../model/Log';
 import { LogStreamRecord, StoredLogStream } from '../model/stream';
 
 export enum StorageKeys {
@@ -10,11 +11,13 @@ export enum StorageKeys {
 export type RootState = {
   dataSources: Record<string, DataSourceRecord>;
   streams: Record<string, LogStreamRecord>;
+  logs: Record<string, Log[]>;
 };
 
 const rootState: RootState = reactive({
   dataSources: {},
   streams: {},
+  logs: {},
 });
 
 const save = () => {

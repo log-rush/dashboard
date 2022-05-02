@@ -16,7 +16,7 @@
             <template #suffix>
               <n-space justify="end" align="center" :wrap="false">
                 <n-button>Subscribe</n-button>
-                <n-button @click="logPeekOpen = stream.id">Show Logs</n-button>
+                <n-button @click="openLogPeek(stream.id)">Show Logs</n-button>
               </n-space>
             </template>
           </n-list-item>
@@ -30,10 +30,7 @@
         </n-empty>
       </n-space>
     </n-space>
-    <LogPeekModal
-      :is-open="logPeekOpen !== undefined"
-      @close="logPeekOpen = undefined"
-    />
+    <LogPeekModal :stream="openLogPeekStream" @close="closeLogPeek()" />
     <template #extra>
       <n-space>
         <n-space justify="end" align="center" :wrap="false">
@@ -74,7 +71,7 @@ const route = useRoute();
 const router = useRouter();
 const dataSource = ref<DataSource | undefined>(undefined);
 const logStreams = ref<LogStream[]>([]);
-const logPeekOpen = ref<string | undefined>(undefined);
+const openLogPeekStream = ref<string | undefined>(undefined);
 
 onMounted(async () => {
   const id = route.params['id'] as string;
@@ -107,6 +104,19 @@ const deleteDataSource = (ds: DataSource | undefined) => {
       router.push('/data-sources');
     },
   });
+};
+
+const openLogPeek = (stream: string) => {
+  dataSourcesStore.subscribeToStream(dataSource.value?.id ?? '', stream);
+  openLogPeekStream.value = stream;
+};
+
+const closeLogPeek = () => {
+  dataSourcesStore.unsubscribeFromStream(
+    dataSource.value?.id ?? '',
+    openLogPeekStream.value ?? '',
+  );
+  openLogPeekStream.value = undefined;
 };
 
 const refresh = async () => {
