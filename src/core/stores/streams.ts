@@ -3,13 +3,16 @@ import { LogStream } from '../model/stream';
 import { useDataSources } from './dataSources';
 import { StorageKeys, useRootState } from './root';
 
+const _rootState = useRootState();
+const saveState = _rootState.save;
+const { logStreams } = _rootState;
+
 const getStreamsFrom = async (dsId: string): Promise<LogStream[]> => {
   // TODO: store state of streams
   // const cached = logStreams[dsId];
   // if (cached) {
   //   return cached;
   // }
-  const { logStreams, rootState } = useRootState();
   const ds = useDataSources().getDataSource(dsId);
   if (!ds) {
     return [];
@@ -24,9 +27,10 @@ const getStreamsFrom = async (dsId: string): Promise<LogStream[]> => {
       isSubscribed: false,
       fromCache: false,
     };
-    rootState.logs[stream.id] = [];
+    _rootState.rootState.logs[stream.id] = []; // TODO: add logs store
     convertedStreams.push(logStreams[stream.id]);
   }
+  saveState();
   return convertedStreams;
 };
 
