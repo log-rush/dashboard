@@ -13,7 +13,7 @@
           Close
         </n-button>
       </template>
-      <n-log :rows="rows" :log="logs"></n-log>
+      <n-log :rows="rows" :log="logs" trim style="height: 55vh"></n-log>
     </n-card>
   </n-modal>
 </template>

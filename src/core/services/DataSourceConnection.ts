@@ -1,24 +1,25 @@
-import { reactive, ref } from 'vue';
 import { Socket } from '../api/ws/socket';
 import { ConnectionStatus } from '../model/dataSource';
-import { Log } from '../model/Log';
+import { Log } from '../model/log';
 import { LRPCoder, LRPOperation } from './LRPCoder';
 
 export class DataSourceConnection {
   private reconnectTimeout = 3_000;
-  private maxRetryAttempts = 10;
+  private maxRetryAttempts = 3;
 
   private connection: Socket;
-  private retryAttempts = 10;
+  private retryAttempts = 3;
   private isReconnecting = false;
   private shouldReconnect = true;
-  public state = ref<ConnectionStatus>('disconnected');
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private logHandler: (stream: string, log: Log) => void = () => {};
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  private statusUpdateHandler: (status: ConnectionStatus) => void = () => {};
+
   constructor(public readonly id: string, public readonly domain: string) {
-    this.state.value = 'connecting';
+    this.statusUpdateHandler('connecting');
     this.connection = new Socket(this.domain);
     this.setupSocket();
   }
@@ -28,6 +29,13 @@ export class DataSourceConnection {
       this.shouldReconnect = false;
       this.connection.close();
     }
+  }
+
+  public tryReConnect() {
+    this.retryAttempts = this.maxRetryAttempts;
+    this.shouldReconnect = true;
+    this.statusUpdateHandler('warn');
+    this.reconnect();
   }
 
   public subscribe(streamId: string) {
@@ -50,6 +58,10 @@ export class DataSourceConnection {
 
   public setLogHandler(handler: (stream: string, log: Log) => void) {
     this.logHandler = handler;
+  }
+
+  public setStatusUpdateHandler(handler: (status: ConnectionStatus) => void) {
+    this.statusUpdateHandler = handler;
   }
 
   private send(msg: string) {
@@ -94,16 +106,16 @@ export class DataSourceConnection {
 
   private handleOpen() {
     this.retryAttempts = this.maxRetryAttempts;
-    this.state.value = 'connected';
+    this.statusUpdateHandler('connected');
   }
 
   private handleError() {
-    this.state.value = 'error';
+    this.statusUpdateHandler('error');
     this.reconnect();
   }
 
   private handleClose() {
-    this.state.value = 'disconnected';
+    this.statusUpdateHandler('disconnected');
     this.reconnect();
   }
 
@@ -115,13 +127,14 @@ export class DataSourceConnection {
     ) {
       return;
     }
+    console.log('reconnecting');
     this.retryAttempts--;
     this.isReconnecting = true;
     if (this.connection.state === WebSocket.OPEN) {
       this.close();
     }
     setTimeout(() => {
-      this.state.value = 'connecting';
+      this.statusUpdateHandler('connecting');
       this.connection = new Socket(this.domain);
       this.setupSocket();
       this.isReconnecting = false;

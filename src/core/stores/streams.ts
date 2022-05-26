@@ -1,11 +1,11 @@
 import { DataSourcesService } from '../services/dataSourceService';
-import { LogStream } from '../model/stream';
+import { LogStream, StoredLogStream } from '../model/logStream';
 import { useDataSources } from './dataSources';
 import { StorageKeys, useRootState } from './root';
 
 const _rootState = useRootState();
 const saveState = _rootState.save;
-const { logStreams } = _rootState;
+const { logStreams } = _rootState.reactiveState;
 
 const getStreamsFrom = async (dsId: string): Promise<LogStream[]> => {
   // TODO: store state of streams
@@ -20,15 +20,15 @@ const getStreamsFrom = async (dsId: string): Promise<LogStream[]> => {
   const streams = await DataSourcesService.getStreams(ds.url);
   const convertedStreams: LogStream[] = [];
   for (const stream of streams) {
-    logStreams[stream.id] = {
+    logStreams[dsId][stream.id] = {
       ...stream,
       dataSource: dsId,
       status: 'disconnected',
       isSubscribed: false,
       fromCache: false,
     };
-    _rootState.rootState.logs[stream.id] = []; // TODO: add logs store
-    convertedStreams.push(logStreams[stream.id]);
+    _rootState.reactiveState.logs[stream.id] = []; // TODO: add logs store
+    convertedStreams.push(logStreams[dsId][stream.id]);
   }
   saveState();
   return convertedStreams;
@@ -37,14 +37,15 @@ const getStreamsFrom = async (dsId: string): Promise<LogStream[]> => {
 const init = async () => {
   const storedStreams = localStorage.getItem(StorageKeys.Streams);
   if (storedStreams) {
-    const parsedLogStreams = JSON.parse(storedStreams);
-    for (const [id, ls] of Object.entries(parsedLogStreams)) {
+    const parsedLogStreams: StoredLogStream[] = JSON.parse(storedStreams);
+    for (const ls of parsedLogStreams) {
       // TODO: fetch current state
-      // logStreams[id] = ls.map((ls) => ({
-      //   ...ls,
-      //   fromCache: true,
-      //   status: 'disconnected',
-      // }));
+      logStreams[ls.dataSource][ls.id] = {
+        ...ls,
+        isSubscribed: false,
+        fromCache: true,
+        status: 'disconnected',
+      };
     }
   }
 };

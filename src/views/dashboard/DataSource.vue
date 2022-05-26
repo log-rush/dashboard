@@ -15,6 +15,7 @@
             </n-thing>
             <template #suffix>
               <n-space justify="end" align="center" :wrap="false">
+                <Status :status="stream.status" />
                 <n-button>Subscribe</n-button>
                 <n-button @click="openLogPeek(stream.id)">Show Logs</n-button>
               </n-space>
@@ -35,9 +36,15 @@
       <n-space>
         <n-space justify="end" align="center" :wrap="false">
           <Status :status="getStatus(dataSource?.id)" />
+          <n-button
+            v-if="getStatus(dataSource?.id) === 'disconnected'"
+            ghost
+            @click="reconnect()"
+            >Reconnect</n-button
+          >
           <n-button @click="deleteDataSource(dataSource)">Delete</n-button>
+          <n-button ghost @click="refresh()">Refresh</n-button>
         </n-space>
-        <n-button ghost @click="refresh()">Refresh</n-button>
       </n-space>
     </template>
   </page-layout>
@@ -62,7 +69,7 @@ import Status from '@/components/util/Status.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useLogStreams } from '@/core/stores/streams';
 import LogPeekModal from '@/components/streams/modals/LogPeekModal.vue';
-import { LogStream } from '@/core/model/stream';
+import { LogStream } from '@/core/model/logStream';
 
 const dataSourcesStore = useDataSources();
 const logStreamStore = useLogStreams();
@@ -124,6 +131,12 @@ const refresh = async () => {
     logStreams.value = await logStreamStore.logStreamsForDataSource(
       dataSource.value.id,
     );
+  }
+};
+
+const reconnect = () => {
+  if (dataSource.value) {
+    dataSourcesStore.reconnect(dataSource.value.id);
   }
 };
 </script>

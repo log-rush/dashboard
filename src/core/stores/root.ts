@@ -1,31 +1,29 @@
 import { reactive } from 'vue';
-import { DataSourceRecord, StoredDataSource } from '../model/dataSource';
-import { Log } from '../model/Log';
-import { LogStreamRecord, StoredLogStream } from '../model/stream';
+import { StoredDataSource } from '../model/dataSource';
+import { StoredLogStream } from '../model/logStream';
+import { ReactiveState, StaticState } from '../model/state';
 
 export enum StorageKeys {
   DataSources = '&ds',
   Streams = '&ls',
 }
 
-export type RootState = {
-  dataSources: Record<string, DataSourceRecord>;
-  streams: Record<string, LogStreamRecord>;
-  logs: Record<string, Log[]>;
-};
-
-const rootState: RootState = reactive({
+const reactiveState = reactive<ReactiveState>({
   dataSources: {},
-  streams: {},
+  logStreams: {},
   logs: {},
 });
+
+const staticState: StaticState = {
+  connections: {},
+};
 
 const save = () => {
   // store data sources
   localStorage.setItem(
     StorageKeys.DataSources,
     JSON.stringify(
-      Object.values(rootState.dataSources).map(
+      Object.values(reactiveState.dataSources).map(
         (ds): StoredDataSource => ({
           id: ds.id,
           name: ds.name,
@@ -39,21 +37,22 @@ const save = () => {
   localStorage.setItem(
     StorageKeys.Streams,
     JSON.stringify(
-      Object.values(rootState.streams).map(
-        (ls): StoredLogStream => ({
-          id: ls.id,
-          alias: ls.alias,
-          dataSource: ls.dataSource,
-        }),
+      Object.keys(reactiveState.logStreams).flatMap((id) =>
+        Object.values(reactiveState.logStreams[id]).map(
+          (ls): StoredLogStream => ({
+            id: ls.id,
+            alias: ls.alias,
+            dataSource: ls.dataSource,
+          }),
+        ),
       ),
     ),
   );
 };
 
 const Store = {
-  rootState,
-  dataSources: rootState.dataSources,
-  logStreams: rootState.streams,
+  reactiveState,
+  staticState,
   save,
 };
 
