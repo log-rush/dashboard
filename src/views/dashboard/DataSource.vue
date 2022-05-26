@@ -1,6 +1,6 @@
 <template>
-  <template v-if="dataSource">
-    <page-layout :title="dataSource.name ?? 'unknown DataSource'">
+  <page-layout :title="dataSource?.name ?? 'unknown DataSource'">
+    <template v-if="dataSource">
       <n-space vertical size="large">
         <n-space :size="30">
           <n-space vertical :size="0">
@@ -47,10 +47,15 @@
         </n-space>
       </n-space>
       <LogPeekModal :stream="openLogPeekStream" @close="closeLogPeek()" />
-      <template #extra>
-        <n-space>
-          <n-space justify="end" align="center" :wrap="false">
-            <Status :status="getStatus(dataSource?.id)" />
+    </template>
+    <template v-else>
+      <n-empty description="DataSource ot found"> </n-empty>
+    </template>
+    <template #extra>
+      <n-space>
+        <n-space justify="end" align="center" :wrap="false">
+          <Status :status="getStatus(dataSource?.id)" />
+          <template v-if="dataSource">
             <n-button
               v-if="getStatus(dataSource?.id) === 'disconnected'"
               ghost
@@ -58,15 +63,12 @@
               >Reconnect</n-button
             >
             <n-button @click="deleteDataSource(dataSource)">Delete</n-button>
-            <n-button ghost @click="refresh()">Refresh</n-button>
-          </n-space>
+          </template>
+          <n-button ghost @click="refresh()">Refresh</n-button>
         </n-space>
-      </template>
-    </page-layout>
-  </template>
-  <template v-else>
-    <n-empty description="DataSource ot found"> </n-empty>
-  </template>
+      </n-space>
+    </template>
+  </page-layout>
 </template>
 
 <script setup lang="ts">
