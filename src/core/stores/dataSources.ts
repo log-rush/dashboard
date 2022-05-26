@@ -48,18 +48,6 @@ const reconnect = (id: string) => {
 const getDataSource = (id: string | undefined): DataSource | undefined =>
   dataSources[id ?? ''];
 
-const subscribeToStream = (ofDataSourceId: string, stream: string) => {
-  const ds = dataSources[ofDataSourceId ?? ''];
-  if (!ds) return;
-  connections[ds.id].subscribe(stream);
-};
-
-const unsubscribeFromStream = (ofDataSourceId: string, stream: string) => {
-  const ds = dataSources[ofDataSourceId ?? ''];
-  if (!ds) return;
-  connections[ds.id].unsubscribe(stream);
-};
-
 const createConnection = (id: string, url: string): DataSourceConnection => {
   const connection = new DataSourceConnection(id, url.split('://')[1]);
   connection.setLogHandler(logHandler);
@@ -110,8 +98,6 @@ const Store = {
   createDataSource,
   deleteDataSource,
   getDataSource,
-  subscribeToStream,
-  unsubscribeFromStream,
   reconnect,
 };
 

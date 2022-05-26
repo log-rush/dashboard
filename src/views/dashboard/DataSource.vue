@@ -31,7 +31,14 @@
               <template #suffix>
                 <n-space justify="end" align="center" :wrap="false">
                   <Status :status="stream.status" />
-                  <n-button>Subscribe</n-button>
+                  <n-button
+                    v-if="!stream.isSubscribed"
+                    @click="subscribe(stream.id)"
+                    >Subscribe</n-button
+                  >
+                  <n-button v-else @click="unsubscribe(stream.id)"
+                    >Unsubscribe</n-button
+                  >
                   <n-button @click="openLogPeek(stream.id)">Show Logs</n-button>
                 </n-space>
               </template>
@@ -92,7 +99,7 @@ import Status from '@/components/util/Status.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useLogStreams } from '@/core/stores/streams';
 import LogPeekModal from '@/components/streams/modals/LogPeekModal.vue';
-import { LogStream } from '@/core/model/logStream';
+import { LogStreamRecord } from '@/core/model/logStream';
 
 const dataSourcesStore = useDataSources();
 const logStreamStore = useLogStreams();
@@ -100,7 +107,7 @@ const dialog = useDialog();
 const route = useRoute();
 const router = useRouter();
 const dataSource = ref<DataSource | undefined>(undefined);
-const logStreams = ref<LogStream[]>([]);
+const logStreams = ref<LogStreamRecord[]>([]);
 const openLogPeekStream = ref<string | undefined>(undefined);
 
 onMounted(async () => {
@@ -136,13 +143,21 @@ const deleteDataSource = (ds: DataSource | undefined) => {
   });
 };
 
+const subscribe = (id: string) => {
+  logStreamStore.subscribe(dataSource.value?.id ?? '', id);
+};
+
+const unsubscribe = (id: string) => {
+  logStreamStore.unsubscribe(dataSource.value?.id ?? '', id);
+};
+
 const openLogPeek = (stream: string) => {
-  dataSourcesStore.subscribeToStream(dataSource.value?.id ?? '', stream);
+  logStreamStore.subscribe(dataSource.value?.id ?? '', stream);
   openLogPeekStream.value = stream;
 };
 
 const closeLogPeek = () => {
-  dataSourcesStore.unsubscribeFromStream(
+  logStreamStore.unsubscribe(
     dataSource.value?.id ?? '',
     openLogPeekStream.value ?? '',
   );

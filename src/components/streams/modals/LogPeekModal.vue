@@ -36,11 +36,11 @@ const emit = defineEmits<{
 }>();
 
 const logs = computed(() =>
-  (rootState.rootState.logs[stream?.value ?? ''] ?? [])
+  (rootState.reactiveState.logs[stream?.value ?? ''] ?? [])
     .map((l) => l.message)
     .join('\n'),
 );
 const rows = computed(
-  () => (rootState.rootState.logs[stream?.value ?? ''] ?? []).length,
+  () => (rootState.reactiveState.logs[stream?.value ?? ''] ?? []).length,
 );
 </script>

@@ -38,13 +38,15 @@ const save = () => {
     StorageKeys.Streams,
     JSON.stringify(
       Object.keys(reactiveState.logStreams).flatMap((id) =>
-        Object.values(reactiveState.logStreams[id]).map(
-          (ls): StoredLogStream => ({
-            id: ls.id,
-            alias: ls.alias,
-            dataSource: ls.dataSource,
-          }),
-        ),
+        Object.values(reactiveState.logStreams[id])
+          .filter((ls) => ls.isSubscribed)
+          .map(
+            (ls): StoredLogStream => ({
+              id: ls.id,
+              alias: ls.alias,
+              dataSource: ls.dataSource,
+            }),
+          ),
       ),
     ),
   );
