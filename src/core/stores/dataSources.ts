@@ -64,7 +64,9 @@ const createConnection = (id: string, url: string): DataSourceConnection => {
   const connection = new DataSourceConnection(id, url.split('://')[1]);
   connection.setLogHandler(logHandler);
   connection.setStatusUpdateHandler((status) => {
-    dataSources[id].status = status;
+    if (dataSources[id]) {
+      dataSources[id].status = status;
+    }
   });
   return connection;
 };
@@ -74,7 +76,6 @@ const logHandler = (stream: string, log: Log) => {
 };
 
 const init = async () => {
-  const { reactiveState, save } = useRootState();
   const storedSources = localStorage.getItem(StorageKeys.DataSources);
   if (!storedSources) return;
 
@@ -83,23 +84,22 @@ const init = async () => {
     DataSourcesService.getDataSource(ds.url).then((fetchedDataSource) => {
       if (fetchedDataSource) {
         if (fetchedDataSource.id !== ds.id) {
-          // TODO: handle data source id change
-          // deleteDataSource(ds);
-          // createDataSource(fetchedDataSource.url);
+          deleteDataSource(ds.id);
+          createDataSource(ds.url);
         } else {
           dataSources[ds.id].name = fetchedDataSource.name;
           dataSources[ds.id].version = fetchedDataSource.version;
         }
       }
     });
-    reactiveState.dataSources[ds.id] = {
+    dataSources[ds.id] = {
       ...ds,
       status: 'disconnected',
     };
-    reactiveState.logStreams[ds.id] = reactiveState.logStreams[ds.id] ?? {};
+    logStreams[ds.id] = logStreams[ds.id] ?? {};
     connections[ds.id] = createConnection(ds.id, ds.url);
   }
-  save();
+  saveState();
 };
 init();
 

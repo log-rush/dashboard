@@ -12,7 +12,10 @@
                 {{ dataSource.name }}
               </template>
               <template #description>
-                {{ dataSource.url }} ({{ dataSource.version }})
+                <n-p>
+                  {{ dataSource.url }} ({{ dataSource.version }})
+                  <n-text italic> ({{ dataSource.id }}) </n-text>
+                </n-p>
               </template>
             </n-thing>
             <template #suffix>
@@ -61,6 +64,8 @@ import {
   NListItem,
   NThing,
   NEmpty,
+  NP,
+  NText,
   useDialog,
 } from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
