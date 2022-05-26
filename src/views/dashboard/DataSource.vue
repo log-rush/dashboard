@@ -1,53 +1,72 @@
 <template>
-  <page-layout :title="dataSource?.name ?? 'unknown DataSource'">
-    <n-space vertical size="large">
-      <n-h2>LogStreams</n-h2>
-      <n-space vertical>
-        <n-list bordered v-if="logStreams.length > 0">
-          <n-list-item v-for="stream of logStreams" :key="stream.id">
-            <n-thing>
-              <template #header>
-                {{ stream.alias }}
+  <template v-if="dataSource">
+    <page-layout :title="dataSource.name ?? 'unknown DataSource'">
+      <n-space vertical size="large">
+        <n-space :size="30">
+          <n-space vertical :size="0">
+            <n-p> URL </n-p>
+            <n-h6>{{ dataSource.url }}</n-h6>
+          </n-space>
+          <n-space vertical :size="0">
+            <n-p> ID </n-p>
+            <n-h6>{{ dataSource.id }}</n-h6>
+          </n-space>
+          <n-space vertical :size="0">
+            <n-p> VERSION </n-p>
+            <n-h6>{{ dataSource.version }}</n-h6>
+          </n-space>
+        </n-space>
+        <n-h2>LogStreams</n-h2>
+        <n-space vertical>
+          <n-list bordered v-if="logStreams.length > 0">
+            <n-list-item v-for="stream of logStreams" :key="stream.id">
+              <n-thing>
+                <template #header>
+                  {{ stream.alias }}
+                </template>
+                <template #description>
+                  {{ stream.id }}
+                </template>
+              </n-thing>
+              <template #suffix>
+                <n-space justify="end" align="center" :wrap="false">
+                  <Status :status="stream.status" />
+                  <n-button>Subscribe</n-button>
+                  <n-button @click="openLogPeek(stream.id)">Show Logs</n-button>
+                </n-space>
               </template>
-              <template #description>
-                {{ stream.id }}
-              </template>
-            </n-thing>
-            <template #suffix>
-              <n-space justify="end" align="center" :wrap="false">
-                <Status :status="stream.status" />
-                <n-button>Subscribe</n-button>
-                <n-button @click="openLogPeek(stream.id)">Show Logs</n-button>
-              </n-space>
-            </template>
-          </n-list-item>
-        </n-list>
-        <n-empty v-if="!dataSource" description="DataSource not found">
-        </n-empty>
-        <n-empty
-          v-else-if="logStreams.length === 0"
-          description="No LogStream found"
-        >
-        </n-empty>
-      </n-space>
-    </n-space>
-    <LogPeekModal :stream="openLogPeekStream" @close="closeLogPeek()" />
-    <template #extra>
-      <n-space>
-        <n-space justify="end" align="center" :wrap="false">
-          <Status :status="getStatus(dataSource?.id)" />
-          <n-button
-            v-if="getStatus(dataSource?.id) === 'disconnected'"
-            ghost
-            @click="reconnect()"
-            >Reconnect</n-button
+            </n-list-item>
+          </n-list>
+          <n-empty v-if="!dataSource" description="DataSource not found">
+          </n-empty>
+          <n-empty
+            v-else-if="logStreams.length === 0"
+            description="No LogStream found"
           >
-          <n-button @click="deleteDataSource(dataSource)">Delete</n-button>
-          <n-button ghost @click="refresh()">Refresh</n-button>
+          </n-empty>
         </n-space>
       </n-space>
-    </template>
-  </page-layout>
+      <LogPeekModal :stream="openLogPeekStream" @close="closeLogPeek()" />
+      <template #extra>
+        <n-space>
+          <n-space justify="end" align="center" :wrap="false">
+            <Status :status="getStatus(dataSource?.id)" />
+            <n-button
+              v-if="getStatus(dataSource?.id) === 'disconnected'"
+              ghost
+              @click="reconnect()"
+              >Reconnect</n-button
+            >
+            <n-button @click="deleteDataSource(dataSource)">Delete</n-button>
+            <n-button ghost @click="refresh()">Refresh</n-button>
+          </n-space>
+        </n-space>
+      </template>
+    </page-layout>
+  </template>
+  <template v-else>
+    <n-empty description="DataSource ot found"> </n-empty>
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -59,6 +78,8 @@ import {
   NThing,
   NEmpty,
   NH2,
+  NH6,
+  NP,
   useDialog,
 } from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
