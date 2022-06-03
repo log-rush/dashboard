@@ -1225,6 +1225,11 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@log-rush/log-formatter@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@log-rush/log-formatter/-/log-formatter-1.0.0.tgz#461d821fb15069a72e679ee88f967746495b03de"
+  integrity sha512-QH9kH1ONbm5wFOodtXEFfIAs8fvpRKeEla8zezDgxlh5ZcOFk4hBLXXbpFKngqjyIhrpkLjQvUZQIjn8xzn4Cw==
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
