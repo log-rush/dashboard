@@ -1,9 +1,5 @@
 import { DataSourcesService } from '../services/dataSourceService';
-import {
-  LogStream,
-  LogStreamRecord,
-  StoredLogStream,
-} from '../model/logStream';
+import { LogStreamRecord, StoredLogStream } from '../model/logStream';
 import { useDataSources } from './dataSources';
 import { StorageKeys, useRootState } from './root';
 

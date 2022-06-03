@@ -1,4 +1,5 @@
 import { reactive } from 'vue';
+import { Config } from '../model/config';
 import { StoredDataSource } from '../model/dataSource';
 import { StoredLogStream } from '../model/logStream';
 import { ReactiveState, StaticState } from '../model/state';
@@ -6,12 +7,14 @@ import { ReactiveState, StaticState } from '../model/state';
 export enum StorageKeys {
   DataSources = '&ds',
   Streams = '&ls',
+  Config = '&c',
 }
 
 const reactiveState = reactive<ReactiveState>({
   dataSources: {},
   logStreams: {},
   logs: {},
+  config: {} as Config,
 });
 
 const staticState: StaticState = {
@@ -49,6 +52,11 @@ const save = () => {
           ),
       ),
     ),
+  );
+  // store config
+  localStorage.setItem(
+    StorageKeys.Config,
+    JSON.stringify(reactiveState.config),
   );
 };
 
