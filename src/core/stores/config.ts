@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue';
+import { computed } from 'vue';
 import { Config, ConfigKey } from '../model/config';
 import { StorageKeys, useRootState } from './root';
 

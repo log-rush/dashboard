@@ -1,11 +1,11 @@
 <template>
-  <div :ref="(r) => (wrapper = r as HTMLDivElement)"></div>
+  <div class="log-view" :ref="(r) => (wrapper = r as HTMLDivElement)"></div>
 </template>
 
 <script setup lang="ts">
 import '@log-rush/log-formatter/dist/index.css';
 import { useLogs } from '@/core/stores/logs';
-import { ref, defineProps, onMounted } from 'vue';
+import { ref, defineProps, onMounted, watch } from 'vue';
 import { LogFormat, LogFormatter, Optimization } from '@log-rush/log-formatter';
 
 const props = defineProps<{
@@ -26,6 +26,12 @@ onMounted(() => {
   }
 });
 
+watch(logStore.getLogRef(props.stream), (newLog) => {
+  if (newLog) {
+    appendLog(newLog.message);
+  }
+});
+
 const appendLog = (data: string) => {
   const formatted = formatter.format(data);
   if (wrapper.value) {
@@ -33,3 +39,11 @@ const appendLog = (data: string) => {
   }
 };
 </script>
+
+<style>
+.log-view {
+  max-height: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+</style>

@@ -13,14 +13,7 @@ export enum StorageKeys {
 const reactiveState = reactive<ReactiveState>({
   dataSources: {},
   logStreams: {},
-  logs: {
-    xxx: [
-      {
-        message: '\x1b[4mHello \x1b[21mWorld',
-        timestamp: 0,
-      },
-    ],
-  },
+  logs: {},
   config: {} as Config,
 });
 

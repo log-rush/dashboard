@@ -31,7 +31,10 @@ const getStreamsFrom = async (dsId: string): Promise<LogStreamRecord[]> => {
       isSubscribed: false,
       fromCache: false,
     };
-    _rootState.reactiveState.logs[stream.id] = []; // TODO: add logs store
+    _rootState.reactiveState.logs[stream.id] = {
+      lastLog: undefined,
+      logs: [],
+    };
   }
   saveState();
 
@@ -60,6 +63,10 @@ const unsubscribe = (ofDataSourceId: string, stream: string) => {
     connections[ds.id].unsubscribe(stream);
     logStreams[ofDataSourceId][stream].isSubscribed = false;
     logStreams[ofDataSourceId][stream].status = 'disconnected';
+    _rootState.reactiveState.logs[stream] = {
+      lastLog: undefined,
+      logs: [],
+    };
     saveState();
   }
 };

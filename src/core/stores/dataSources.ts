@@ -60,7 +60,8 @@ const createConnection = (id: string, url: string): DataSourceConnection => {
 };
 
 const logHandler = (stream: string, log: Log) => {
-  _rootState.reactiveState.logs[stream].push(log);
+  _rootState.reactiveState.logs[stream].logs.push(log);
+  _rootState.reactiveState.logs[stream].lastLog = log;
 };
 
 const init = async () => {
