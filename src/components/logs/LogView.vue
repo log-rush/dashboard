@@ -46,4 +46,9 @@ const appendLog = (data: string) => {
   height: 100%;
   overflow-y: auto;
 }
+
+.log-view > p {
+  margin: 0;
+  font-family: monospace;
+}
 </style>

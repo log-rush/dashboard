@@ -6,7 +6,6 @@
       :bordered="false"
       size="huge"
       role="dialog"
-      aria-modal="true"
     >
       <n-form :model="formValue" :rules="rules" size="medium" ref="formRef">
         <n-form-item
