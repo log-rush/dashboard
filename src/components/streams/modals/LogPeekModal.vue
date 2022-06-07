@@ -3,7 +3,7 @@
     <n-card
       style="max-width: 90vw; max-height: 90vh"
       content-style="height: 100%; max-height: 100%; overflow: auto; position: relative;"
-      title="View Logs of xxx"
+      title="View Logs"
       :bordered="false"
       size="huge"
       role="dialog"
