@@ -15,6 +15,7 @@ export type StoredDataSource = {
 
 export type ConnectionStatus =
   | 'disconnected'
+  | 'available'
   | 'connecting'
   | 'connected'
   | 'error'

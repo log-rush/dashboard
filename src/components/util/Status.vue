@@ -9,6 +9,12 @@
         :style="`border-color: ${theme.borderColor}`"
       ></div>
     </template>
+    <template v-else-if="status === 'available'">
+      <div
+        class="status-dot-border"
+        :style="`border-color: ${theme.successColor}`"
+      ></div>
+    </template>
     <template v-else>
       <div
         class="status-dot"
