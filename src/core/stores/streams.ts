@@ -22,14 +22,19 @@ const getStreamsFrom = async (dsId: string): Promise<LogStreamRecord[]> => {
   const streams = await DataSourcesService.getStreams(ds.url);
   for (const stream of streams) {
     if (logStreams[dsId][stream.id]) {
-      logStreams[dsId][stream.id].status = 'connected';
+      if (
+        logStreams[dsId][stream.id].status !== 'connected' &&
+        logStreams[dsId][stream.id].status !== 'connecting'
+      ) {
+        logStreams[dsId][stream.id].status = 'available';
+      }
       logStreams[dsId][stream.id].fromCache = false;
       continue;
     }
     logStreams[dsId][stream.id] = {
       ...stream,
       dataSource: dsId,
-      status: 'connected',
+      status: 'available',
       isSubscribed: false,
       fromCache: false,
     };
@@ -57,8 +62,10 @@ const subscribe = (ofDataSourceId: string, stream: string) => {
   if (logStreams[ofDataSourceId]?.[stream]) {
     const ds = dataSources[ofDataSourceId ?? ''];
     if (!ds) return;
+    logStreams[ofDataSourceId][stream].status = 'connecting';
     connections[ds.id].subscribe(stream);
     logStreams[ofDataSourceId][stream].isSubscribed = true;
+    logStreams[ofDataSourceId][stream].status = 'connected';
     saveState();
   }
 };
@@ -69,6 +76,7 @@ const unsubscribe = (ofDataSourceId: string, stream: string) => {
     if (!ds) return;
     connections[ds.id].unsubscribe(stream);
     logStreams[ofDataSourceId][stream].isSubscribed = false;
+    logStreams[ofDataSourceId][stream].status = 'available';
     _rootState.reactiveState.logs[stream] = {
       lastLog: undefined,
       logs: [],
@@ -94,7 +102,7 @@ const init = async () => {
         ls.id,
       ).then((stream) => {
         if (stream) {
-          logStreams[ls.dataSource][ls.id].status = 'connected';
+          logStreams[ls.dataSource][ls.id].status = 'available';
           logStreams[ls.dataSource][ls.id].alias = stream.alias;
           _rootState.reactiveState.logs[ls.id] = {
             lastLog: undefined,
