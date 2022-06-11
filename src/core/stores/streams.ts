@@ -22,10 +22,9 @@ const getStreamsFrom = async (dsId: string): Promise<LogStreamRecord[]> => {
   const streams = await DataSourcesService.getStreams(ds.url);
   for (const stream of streams) {
     if (logStreams[dsId][stream.id]) {
-      if (
-        logStreams[dsId][stream.id].status !== 'connected' &&
-        logStreams[dsId][stream.id].status !== 'connecting'
-      ) {
+      if (logStreams[dsId][stream.id].isSubscribed) {
+        logStreams[dsId][stream.id].status = 'connected';
+      } else {
         logStreams[dsId][stream.id].status = 'available';
       }
       logStreams[dsId][stream.id].fromCache = false;
