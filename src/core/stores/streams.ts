@@ -2,6 +2,7 @@ import { DataSourcesService } from '../services/dataSourceService';
 import { LogStreamRecord, StoredLogStream } from '../model/logStream';
 import { useDataSources } from './dataSources';
 import { StorageKeys, useRootState } from './root';
+import { LogRushHttpApi } from '../api/http';
 
 const _rootState = useRootState();
 const saveState = () => _rootState.save('logStreams');
@@ -22,6 +23,7 @@ const getStreamsFrom = async (dsId: string): Promise<LogStreamRecord[]> => {
   for (const stream of streams) {
     if (logStreams[dsId][stream.id]) {
       logStreams[dsId][stream.id].status = 'connected';
+      logStreams[dsId][stream.id].fromCache = false;
       continue;
     }
     logStreams[dsId][stream.id] = {
@@ -35,6 +37,12 @@ const getStreamsFrom = async (dsId: string): Promise<LogStreamRecord[]> => {
       lastLog: undefined,
       logs: [],
     };
+  }
+
+  for (const stream of Object.values(logStreams[dsId])) {
+    if (stream.fromCache === true) {
+      stream.status = 'error';
+    }
   }
   saveState();
 
@@ -72,18 +80,31 @@ const unsubscribe = (ofDataSourceId: string, stream: string) => {
 const init = async () => {
   const storedStreams = localStorage.getItem(StorageKeys.Streams);
   if (storedStreams) {
-    console.log(storedStreams);
     const parsedLogStreams: StoredLogStream[] = JSON.parse(storedStreams);
     for (const ls of parsedLogStreams) {
-      // TODO: fetch current state
-      // TODO: Connect to subscribe ds
-      console.log(ls.id);
       logStreams[ls.dataSource][ls.id] = {
         ...ls,
         isSubscribed: true,
         fromCache: true,
-        status: 'warn',
+        status: 'connecting',
       };
+      // fetch current state
+      LogRushHttpApi.getStream(
+        _rootState.reactiveState.dataSources[ls.dataSource].url,
+        ls.id,
+      ).then((stream) => {
+        if (stream) {
+          logStreams[ls.dataSource][ls.id].status = 'connected';
+          logStreams[ls.dataSource][ls.id].alias = stream.alias;
+          _rootState.reactiveState.logs[ls.id] = {
+            lastLog: undefined,
+            logs: [],
+          };
+          subscribe(ls.dataSource, ls.id);
+        } else {
+          logStreams[ls.dataSource][ls.id].status = 'error';
+        }
+      });
     }
   }
 };
