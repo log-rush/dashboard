@@ -31,15 +31,20 @@
               <template #suffix>
                 <n-space justify="end" align="center" :wrap="false">
                   <Status :status="stream.status" />
+                  <n-button @click="openLogPeek(stream.id)">Show Logs</n-button>
+
                   <n-button
                     v-if="!stream.isSubscribed"
                     @click="subscribe(stream.id)"
                     >Subscribe</n-button
                   >
-                  <n-button v-else @click="unsubscribe(stream.id)"
+                  <n-button
+                    v-else
+                    type="error"
+                    ghost
+                    @click="unsubscribe(stream.id)"
                     >Unsubscribe</n-button
                   >
-                  <n-button @click="openLogPeek(stream.id)">Show Logs</n-button>
                 </n-space>
               </template>
             </n-list-item>

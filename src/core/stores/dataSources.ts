@@ -48,6 +48,14 @@ const reconnect = (id: string) => {
 const getDataSource = (id: string | undefined): DataSource | undefined =>
   dataSources[id ?? ''];
 
+const connectDataSource = (id: string) => {
+  if (!connections[id] && getDataSource(id)) {
+    connections[id] = createConnection(id, getDataSource(id)?.url ?? '');
+  } else {
+    connections[id]?.tryReConnect();
+  }
+};
+
 const createConnection = (id: string, url: string): DataSourceConnection => {
   const connection = new DataSourceConnection(id, url.split('://')[1]);
   connection.setLogHandler(logHandler);
@@ -79,6 +87,9 @@ const init = async () => {
           dataSources[ds.id].name = fetchedDataSource.name;
           dataSources[ds.id].version = fetchedDataSource.version;
         }
+        if (!connections[ds.id]) {
+          dataSources[ds.id].status = 'available';
+        }
       }
     });
     dataSources[ds.id] = {
@@ -96,6 +107,7 @@ const Store = {
   allDataSources: computed(() =>
     Object.values(useRootState().reactiveState.dataSources),
   ),
+  connectToDataSource: connectDataSource,
   createDataSource,
   deleteDataSource,
   getDataSource,

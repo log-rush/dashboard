@@ -22,10 +22,21 @@
               <n-space justify="end" align="center" :wrap="false">
                 <Status :status="getStatus(dataSource.id)" />
                 <n-button
+                  v-if="dataSource.status === 'available'"
+                  @click="connect(dataSource.id)"
+                  >Connect</n-button
+                >
+                <n-button
+                  v-if="dataSource.status === 'connected'"
+                  @click="handleShow(dataSource.id)"
+                  >Show</n-button
+                >
+                <n-button
+                  type="error"
+                  ghost
                   @click="deleteDataSource(dataSource.id, dataSource.name)"
                   >Delete</n-button
                 >
-                <n-button @click="handleShow(dataSource.id)">Show</n-button>
               </n-space>
             </template>
           </n-list-item>
@@ -98,6 +109,10 @@ const deleteDataSource = (id: string, name: string) => {
       dataSourcesStore.deleteDataSource(id);
     },
   });
+};
+
+const connect = (id: string) => {
+  dataSourcesStore.connectToDataSource(id);
 };
 
 const handleShow = (id: string) => {
