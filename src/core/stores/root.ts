@@ -21,43 +21,51 @@ const staticState: StaticState = {
   connections: {},
 };
 
-const save = () => {
+const save = (key?: keyof ReactiveState) => {
   // store data sources
-  localStorage.setItem(
-    StorageKeys.DataSources,
-    JSON.stringify(
-      Object.values(reactiveState.dataSources).map(
-        (ds): StoredDataSource => ({
-          id: ds.id,
-          name: ds.name,
-          url: ds.url,
-          version: ds.version,
-        }),
+  if (!key || key === 'dataSources') {
+    localStorage.setItem(
+      StorageKeys.DataSources,
+      JSON.stringify(
+        Object.values(reactiveState.dataSources).map(
+          (ds): StoredDataSource => ({
+            id: ds.id,
+            name: ds.name,
+            url: ds.url,
+            version: ds.version,
+          }),
+        ),
       ),
-    ),
-  );
+    );
+  }
+
   // store log streams
-  localStorage.setItem(
-    StorageKeys.Streams,
-    JSON.stringify(
-      Object.keys(reactiveState.logStreams).flatMap((id) =>
-        Object.values(reactiveState.logStreams[id])
-          .filter((ls) => ls.isSubscribed)
-          .map(
-            (ls): StoredLogStream => ({
-              id: ls.id,
-              alias: ls.alias,
-              dataSource: ls.dataSource,
-            }),
-          ),
+  if (!key || key === 'logStreams') {
+    localStorage.setItem(
+      StorageKeys.Streams,
+      JSON.stringify(
+        Object.keys(reactiveState.logStreams).flatMap((id) =>
+          Object.values(reactiveState.logStreams[id])
+            .filter((ls) => ls.isSubscribed)
+            .map(
+              (ls): StoredLogStream => ({
+                id: ls.id,
+                alias: ls.alias,
+                dataSource: ls.dataSource,
+              }),
+            ),
+        ),
       ),
-    ),
-  );
+    );
+  }
+
   // store config
-  localStorage.setItem(
-    StorageKeys.Config,
-    JSON.stringify(reactiveState.config),
-  );
+  if (!key || key === 'config') {
+    localStorage.setItem(
+      StorageKeys.Config,
+      JSON.stringify(reactiveState.config),
+    );
+  }
 };
 
 const Store = {

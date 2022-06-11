@@ -3,7 +3,7 @@ import { Config, ConfigKey } from '../model/config';
 import { StorageKeys, useRootState } from './root';
 
 const _rootState = useRootState();
-const saveState = _rootState.save;
+const saveState = () => _rootState.save('config');
 const { config } = _rootState.reactiveState;
 
 const defaultConfig: Config = {

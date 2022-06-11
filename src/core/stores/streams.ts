@@ -4,7 +4,7 @@ import { useDataSources } from './dataSources';
 import { StorageKeys, useRootState } from './root';
 
 const _rootState = useRootState();
-const saveState = _rootState.save;
+const saveState = () => _rootState.save('logStreams');
 const { logStreams, dataSources } = _rootState.reactiveState;
 const { connections } = _rootState.staticState;
 
@@ -27,7 +27,7 @@ const getStreamsFrom = async (dsId: string): Promise<LogStreamRecord[]> => {
     logStreams[dsId][stream.id] = {
       ...stream,
       dataSource: dsId,
-      status: 'disconnected',
+      status: 'connected',
       isSubscribed: false,
       fromCache: false,
     };
@@ -51,7 +51,6 @@ const subscribe = (ofDataSourceId: string, stream: string) => {
     if (!ds) return;
     connections[ds.id].subscribe(stream);
     logStreams[ofDataSourceId][stream].isSubscribed = true;
-    logStreams[ofDataSourceId][stream].status = 'connected';
     saveState();
   }
 };
@@ -62,7 +61,6 @@ const unsubscribe = (ofDataSourceId: string, stream: string) => {
     if (!ds) return;
     connections[ds.id].unsubscribe(stream);
     logStreams[ofDataSourceId][stream].isSubscribed = false;
-    logStreams[ofDataSourceId][stream].status = 'disconnected';
     _rootState.reactiveState.logs[stream] = {
       lastLog: undefined,
       logs: [],
@@ -74,11 +72,11 @@ const unsubscribe = (ofDataSourceId: string, stream: string) => {
 const init = async () => {
   const storedStreams = localStorage.getItem(StorageKeys.Streams);
   if (storedStreams) {
+    console.log(storedStreams);
     const parsedLogStreams: StoredLogStream[] = JSON.parse(storedStreams);
     for (const ls of parsedLogStreams) {
       // TODO: fetch current state
       // TODO: Connect to subscribe ds
-      // TODO: log streams get lost at reload
       console.log(ls.id);
       logStreams[ls.dataSource][ls.id] = {
         ...ls,

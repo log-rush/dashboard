@@ -6,7 +6,7 @@ import { StorageKeys, useRootState } from './root';
 import { Log } from '../model/log';
 
 const _rootState = useRootState();
-const saveState = _rootState.save;
+const saveState = () => _rootState.save('dataSources');
 const { dataSources, logStreams } = _rootState.reactiveState;
 const { connections } = _rootState.staticState;
 
