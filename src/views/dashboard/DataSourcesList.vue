@@ -81,15 +81,15 @@ import {
 } from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
 import CreateDataSource from '@/components/dataSources/modals/CreateDataSource.vue';
-import { ref } from 'vue';
-import { useDataSources } from '@/core/stores/dataSources';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Status from '@/components/util/Status.vue';
+import { useDataSources } from '@/core/stores/root';
 
 const dataSourcesStore = useDataSources();
 const dialog = useDialog();
 const router = useRouter();
-const allDataSources = dataSourcesStore.allDataSources;
+const allDataSources = computed(() => dataSourcesStore.allDataSources());
 const createModelOpen = ref(false);
 
 const getStatus = (id: string) =>

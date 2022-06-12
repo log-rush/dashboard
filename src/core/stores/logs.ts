@@ -1,21 +1,42 @@
-import { computed } from 'vue';
 import { Log } from '../model/log';
-import { useRootState } from './root';
+import { CreateStoreFunc, StorageKeys } from './util/type';
 
-const _rootState = useRootState();
-const { logs } = _rootState.reactiveState;
+const createStore: CreateStoreFunc<'logs', StorageKeys.NonPersistent> = ({
+  reactiveState,
+}) => {
+  const { logs } = reactiveState;
 
-const getLogs = (stream: string): Log[] => {
-  return logs[stream].logs;
+  const getLogs = (stream: string): Log[] => {
+    return logs[stream].logs;
+  };
+
+  const getLastLog = (stream: string) => {
+    return logs[stream].lastLog;
+  };
+
+  const clearLogs = (streamId: string) => {
+    logs[streamId] = {
+      lastLog: {
+        message: '',
+        timestamp: 0,
+      },
+      logs: [],
+    };
+  };
+
+  const Store = {
+    getLogs,
+    getLastLog,
+    clearLogs,
+  };
+
+  return {
+    key: 'logs',
+    store: Store,
+    setup: () => {
+      return;
+    },
+  };
 };
 
-const getLogRef = (stream: string) => {
-  return computed(() => logs[stream].lastLog);
-};
-
-const Store = {
-  getLogs,
-  getLogRef,
-};
-
-export const useLogs = (): typeof Store => Store;
+export default createStore;

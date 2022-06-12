@@ -1,40 +1,55 @@
-import { computed } from 'vue';
 import { Config, ConfigKey } from '../model/config';
-import { StorageKeys, useRootState } from './root';
+import { CreateStoreFunc, StorageKeys } from './util/type';
 
-const _rootState = useRootState();
-const saveState = () => _rootState.save('config');
-const { config } = _rootState.reactiveState;
+const createStore: CreateStoreFunc<'config', StorageKeys.Config> = ({
+  reactiveState,
+}) => {
+  const { config } = reactiveState;
 
-const defaultConfig: Config = {
-  [ConfigKey.LogBatchSize]: 100,
-};
+  const defaultConfig: Config = {
+    [ConfigKey.LogBatchSize]: 100,
+  };
 
-const getConfig = (key: ConfigKey) => {
-  return config[key];
-};
+  const saveState = () => {
+    localStorage.setItem(
+      StorageKeys.Config,
+      JSON.stringify(reactiveState.config),
+    );
+  };
 
-const setConfig = <K extends ConfigKey>(key: K, value: Config[K]) => {
-  config[key] = value;
-  saveState();
-};
+  const getConfig = (key: ConfigKey) => {
+    return config[key];
+  };
 
-const init = async () => {
-  const storedConfig = localStorage.getItem(StorageKeys.Config);
-  if (storedConfig) {
-    const parsedConfig = JSON.parse(storedConfig);
-    for (const [key, fallback] of Object.entries(defaultConfig)) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      config[key] = parsedConfig[key] ?? fallback;
+  const setConfig = <K extends ConfigKey>(key: K, value: Config[K]) => {
+    config[key] = value;
+    saveState();
+  };
+
+  const init = () => {
+    const storedConfig = localStorage.getItem(StorageKeys.Config);
+    if (storedConfig) {
+      const parsedConfig = JSON.parse(storedConfig);
+      for (const [key, fallback] of Object.entries(defaultConfig)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        config[key] = parsedConfig[key] ?? fallback;
+      }
     }
-  }
-};
-init();
+  };
 
-const Store = {
-  setConfig,
-  getConfig: (key: ConfigKey) => computed(() => getConfig(key)),
+  const Store = {
+    setConfig,
+    getConfig,
+  };
+
+  return {
+    key: 'config',
+    store: Store,
+    storageKey: StorageKeys.Config,
+    save: () => saveState(),
+    setup: () => init(),
+  };
 };
 
-export const useConfig = (): typeof Store => Store;
+export default createStore;

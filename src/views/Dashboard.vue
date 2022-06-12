@@ -54,7 +54,7 @@ import type { MenuOption } from 'naive-ui';
 import { computed, h, onMounted, ref, VNode, watch } from 'vue';
 import { IconRenderer, CreateIconRenderer } from '@/components/Icon';
 import { RouterLink, useRoute } from 'vue-router';
-import { useDataSources } from '@/core/stores/dataSources';
+import { useDataSources } from '@/core/stores/root';
 
 const route = useRoute();
 const dataSourcesStore = useDataSources();
@@ -116,7 +116,7 @@ const DataSourceMenu = computed(
         key: 'data-sources',
         icon: () => IconRenderer('mdi:server'),
         href: '/data-sources',
-        children: dataSourcesStore.allDataSources.value.map((ds) => ({
+        children: dataSourcesStore.allDataSources().map((ds) => ({
           label: ds.name,
           href: `/data-sources/${ds.id}`,
           key: ds.id,

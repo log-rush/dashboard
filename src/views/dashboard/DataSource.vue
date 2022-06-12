@@ -31,20 +31,24 @@
               <template #suffix>
                 <n-space justify="end" align="center" :wrap="false">
                   <Status :status="stream.status" />
-                  <n-button @click="openLogPeek(stream.id)">Show Logs</n-button>
+                  <template v-if="dataSource.status === 'connected'">
+                    <n-button @click="openLogPeek(stream.id)"
+                      >Show Logs</n-button
+                    >
 
-                  <n-button
-                    v-if="!stream.isSubscribed"
-                    @click="subscribe(stream.id)"
-                    >Subscribe</n-button
-                  >
-                  <n-button
-                    v-else
-                    type="error"
-                    ghost
-                    @click="unsubscribe(stream.id)"
-                    >Unsubscribe</n-button
-                  >
+                    <n-button
+                      v-if="!stream.isSubscribed"
+                      @click="subscribe(stream.id)"
+                      >Subscribe</n-button
+                    >
+                    <n-button
+                      v-else
+                      type="error"
+                      ghost
+                      @click="unsubscribe(stream.id)"
+                      >Unsubscribe</n-button
+                    >
+                  </template>
                 </n-space>
               </template>
             </n-list-item>
@@ -74,9 +78,16 @@
               @click="reconnect()"
               >Reconnect</n-button
             >
-            <n-button @click="deleteDataSource(dataSource)">Delete</n-button>
+            <n-button
+              v-if="dataSource.status === 'available'"
+              @click="connect(dataSource?.id ?? '')"
+              >Connect</n-button
+            >
+            <n-button ghost @click="refresh()">Refresh</n-button>
+            <n-button type="error" ghost @click="deleteDataSource(dataSource)"
+              >Delete</n-button
+            >
           </template>
-          <n-button ghost @click="refresh()">Refresh</n-button>
         </n-space>
       </n-space>
     </template>
@@ -98,13 +109,12 @@ import {
 } from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
 import { onMounted, ref } from 'vue';
-import { useDataSources } from '@/core/stores/dataSources';
 import { ConnectionStatus, DataSource } from '@/core/model/dataSource';
 import Status from '@/components/util/Status.vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useLogStreams } from '@/core/stores/streams';
 import LogPeekModal from '@/components/streams/modals/LogPeekModal.vue';
 import { LogStreamRecord } from '@/core/model/logStream';
+import { useDataSources, useLogStreams } from '@/core/stores/root';
 
 const dataSourcesStore = useDataSources();
 const logStreamStore = useLogStreams();
@@ -119,7 +129,7 @@ onMounted(async () => {
   const id = route.params['id'] as string;
   if (id) {
     dataSource.value = dataSourcesStore.getDataSource(id);
-    logStreams.value = await logStreamStore.logStreamsForDataSource(id);
+    logStreams.value = await logStreamStore.getStreamsForDataSource(id);
   }
 });
 
@@ -148,6 +158,10 @@ const deleteDataSource = (ds: DataSource | undefined) => {
   });
 };
 
+const connect = (id: string) => {
+  dataSourcesStore.connectToDataSource(id);
+};
+
 const subscribe = (id: string) => {
   logStreamStore.subscribe(dataSource.value?.id ?? '', id);
 };
@@ -171,7 +185,7 @@ const closeLogPeek = () => {
 
 const refresh = async () => {
   if (dataSource.value) {
-    logStreams.value = await logStreamStore.logStreamsForDataSource(
+    logStreams.value = await logStreamStore.getStreamsForDataSource(
       dataSource.value.id,
     );
   }

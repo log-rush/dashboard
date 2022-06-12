@@ -4,9 +4,9 @@
 
 <script setup lang="ts">
 import '@log-rush/log-formatter/dist/index.css';
-import { useLogs } from '@/core/stores/logs';
 import { ref, defineProps, onMounted, watch } from 'vue';
 import { LogFormat, LogFormatter, Optimization } from '@log-rush/log-formatter';
+import { useLogs } from '@/core/stores/root';
 
 const props = defineProps<{
   stream: string;
@@ -21,16 +21,21 @@ const formatter = new LogFormatter({
 
 onMounted(() => {
   const storedLogs = logStore.getLogs(props.stream);
+  console.log(storedLogs);
   for (const log of storedLogs) {
     appendLog(log.message);
   }
 });
 
-watch(logStore.getLogRef(props.stream), (newLog) => {
-  if (newLog) {
-    appendLog(newLog.message);
-  }
-});
+watch(
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  () => logStore.getLastLog(props.stream)!,
+  (newLog) => {
+    if (newLog) {
+      appendLog(newLog.message);
+    }
+  },
+);
 
 const appendLog = (data: string) => {
   const formatted = formatter.format(data);
