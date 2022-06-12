@@ -58,9 +58,12 @@ const getStreamsFrom = async (dsId: string): Promise<LogStreamRecord[]> => {
 };
 
 const subscribe = (ofDataSourceId: string, stream: string) => {
-  if (logStreams[ofDataSourceId]?.[stream]) {
+  if (
+    logStreams[ofDataSourceId]?.[stream] &&
+    !logStreams[ofDataSourceId]?.[stream].isSubscribed
+  ) {
     const ds = dataSources[ofDataSourceId ?? ''];
-    if (!ds) return;
+    if (!ds || !connections[ds.id]) return;
     logStreams[ofDataSourceId][stream].status = 'connecting';
     connections[ds.id].subscribe(stream);
     logStreams[ofDataSourceId][stream].isSubscribed = true;
@@ -91,7 +94,7 @@ const init = async () => {
     for (const ls of parsedLogStreams) {
       logStreams[ls.dataSource][ls.id] = {
         ...ls,
-        isSubscribed: true,
+        isSubscribed: false,
         fromCache: true,
         status: 'connecting',
       };
