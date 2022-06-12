@@ -84,9 +84,9 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
     });
 
     stores.logStreams.getCachedStreamsForDataSource(id).forEach((stream) => {
-      console.log('subscribing', stream.id);
       connection.subscribe(stream.id);
       stream.isSubscribed = true;
+      stream.status = 'connected';
     });
     return connection;
   };

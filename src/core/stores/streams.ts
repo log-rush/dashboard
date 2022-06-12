@@ -112,7 +112,7 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
 
   const getSubscribedStreams = (): LogStreamRecord[] => {
     return Object.keys(logStreams).flatMap((ds) =>
-      Object.values(logStreams[ds]).filter((stream) => !stream.isSubscribed),
+      Object.values(logStreams[ds]).filter((stream) => stream.isSubscribed),
     );
   };
 
@@ -120,13 +120,13 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
     dsId: string,
   ): LogStreamRecord[] => {
     return (Object.values(logStreams[dsId]) ?? []).filter(
-      (stream) => !stream.isSubscribed,
+      (stream) => stream.isSubscribed,
     );
   };
 
   const getCachedStreamsForDataSource = (dsId: string): LogStreamRecord[] => {
     return (Object.values(logStreams[dsId]) ?? []).filter(
-      (stream) => !stream.fromCache,
+      (stream) => stream.fromCache,
     );
   };
 

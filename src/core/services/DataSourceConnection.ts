@@ -64,11 +64,13 @@ export class DataSourceConnection {
     this.statusUpdateHandler = handler;
   }
 
+  private _queue: string[] = [];
   private send(msg: string) {
     if (this.connection.state === WebSocket.OPEN) {
       this.connection.send(msg);
     } else {
       console.warn('could not send (%s)', msg);
+      this._queue.push(msg);
     }
   }
 
@@ -106,6 +108,14 @@ export class DataSourceConnection {
 
   private handleOpen() {
     this.retryAttempts = this.maxRetryAttempts;
+    if (this._queue.length > 0) {
+      console.log('sending saved queue');
+      const tmp = [...this._queue];
+      this._queue = [];
+      for (const msg of tmp) {
+        this.send(msg);
+      }
+    }
     this.statusUpdateHandler('connected');
   }
 
