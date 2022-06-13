@@ -3,12 +3,14 @@ import { ConfigStore } from '@/core/model/stores/configStore';
 import { DataSourcesStore } from '@/core/model/stores/dataSources';
 import { LogsStore } from '@/core/model/stores/logsStore';
 import { LogStreamsStore } from '@/core/model/stores/logStreams';
+import { AllLogsStore } from '@/core/model/stores/usecases/allLogsStore';
 
 export type Stores = {
   dataSources: DataSourcesStore;
   logStreams: LogStreamsStore;
   logs: LogsStore;
   config: ConfigStore;
+  allLogs: AllLogsStore;
 };
 
 export enum StorageKeys {

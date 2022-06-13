@@ -5,11 +5,13 @@ import createConfigStore from './config';
 import createDataSourcesStore from './dataSources';
 import createLogStreamsStore from './streams';
 import createLogsStore from './logs';
+import createAllLogsStore from './usecases/allLogs';
 import { StorageKeys, Stores } from './util/type';
 import { ConfigStore } from '../model/stores/configStore';
 import { DataSourcesStore } from '../model/stores/dataSources';
 import { LogStreamsStore } from '@/core/model/stores/logStreams';
 import { LogsStore } from '../model/stores/logsStore';
+import { AllLogsStore } from '../model/stores/usecases/allLogsStore';
 
 const reactiveState = reactive<ReactiveState>({
   dataSources: {},
@@ -27,6 +29,7 @@ const stores: Stores = {
   dataSources: {} as DataSourcesStore,
   logStreams: {} as LogStreamsStore,
   logs: {} as LogsStore,
+  allLogs: {} as AllLogsStore,
 };
 
 const noop = () => {
@@ -63,6 +66,7 @@ const storeModules = {
   dataSourcesStore: createDataSourcesStore(storeArgument),
   logStreamsStore: createLogStreamsStore(storeArgument),
   logsStore: createLogsStore(storeArgument),
+  allLogs: createAllLogsStore(storeArgument),
 };
 
 const init = () => {
@@ -78,6 +82,9 @@ const init = () => {
 
   storeModules.logsStore.setup();
   stores[storeModules.logsStore.key] = storeModules.logsStore.store;
+
+  storeModules.allLogs.setup();
+  stores[storeModules.allLogs.key] = storeModules.allLogs.store;
 };
 init();
 
