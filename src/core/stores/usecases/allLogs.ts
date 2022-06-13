@@ -40,6 +40,7 @@ const createStore: CreateStoreFunc<'allLogs', StorageKeys.NonPersistent> = ({
           unwatch: watch(
             () => stores.logs.getLastLog(stream.id),
             (log) => {
+              console.log('should fire');
               if (log) {
                 logRef.value = log;
               }

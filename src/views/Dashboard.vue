@@ -32,6 +32,13 @@
           :value="selectedValue"
           :expand-icon="CreateIconRenderer('mdi:chevron-down')"
         />
+        <n-menu
+          :collapsed="collapsed"
+          :render-label="renderMenuLabel"
+          :options="AllLogsMenu"
+          :value="selectedValue"
+          :expand-icon="CreateIconRenderer('mdi:chevron-down')"
+        />
         <div class="menu-spacer"></div>
         <n-menu
           :collapsed="collapsed"
@@ -143,6 +150,15 @@ const ViewsMenu: MenuOption[] = [
         key: 'b-2',
       },
     ],
+  },
+];
+
+const AllLogsMenu: MenuOption[] = [
+  {
+    label: 'All Logs',
+    key: 'all-logs',
+    href: '/all-logs',
+    icon: () => IconRenderer('mdi:archive-outline'),
   },
 ];
 </script>

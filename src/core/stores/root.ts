@@ -92,3 +92,4 @@ export const useConfig = () => stores.config;
 export const useDataSources = () => stores.dataSources;
 export const useLogStreams = () => stores.logStreams;
 export const useLogs = () => stores.logs;
+export const useAllLogs = () => stores.allLogs;
