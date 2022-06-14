@@ -6,13 +6,16 @@
 import '@log-rush/log-formatter/dist/index.css';
 import { ref, defineProps, onMounted, watch } from 'vue';
 import { LogFormat, LogFormatter, Optimization } from '@log-rush/log-formatter';
-import { useLogs } from '@/core/stores/root';
+import { useConfig, useLogs } from '@/core/stores/root';
+import { ConfigKey } from '@/core/model/config';
 
 const props = defineProps<{
   stream: string;
 }>();
 
 const logStore = useLogs();
+const configStore = useConfig();
+
 const wrapper = ref<HTMLDivElement | null>();
 const formatter = new LogFormatter({
   format: LogFormat.ColoredHtml,
@@ -41,6 +44,9 @@ const appendLog = (data: string) => {
   const formatted = formatter.format(data);
   if (wrapper.value) {
     wrapper.value.innerHTML += formatted;
+    if (configStore.getConfig(ConfigKey.ScrollToBottom)) {
+      wrapper.value.scrollTop = wrapper.value.scrollHeight;
+    }
   }
 };
 </script>

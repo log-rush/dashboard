@@ -8,6 +8,7 @@ const createStore: CreateStoreFunc<'config', StorageKeys.Config> = ({
 
   const defaultConfig: Config = {
     [ConfigKey.LogBatchSize]: 100,
+    [ConfigKey.ScrollToBottom]: true,
   };
 
   const saveState = () => {
@@ -17,7 +18,7 @@ const createStore: CreateStoreFunc<'config', StorageKeys.Config> = ({
     );
   };
 
-  const getConfig = (key: ConfigKey) => {
+  const getConfig = <K extends ConfigKey>(key: K): Config[K] => {
     return config[key];
   };
 
@@ -34,6 +35,12 @@ const createStore: CreateStoreFunc<'config', StorageKeys.Config> = ({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         config[key] = parsedConfig[key] ?? fallback;
+      }
+    } else {
+      for (const [key, fallback] of Object.entries(defaultConfig)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        config[key] = fallback;
       }
     }
   };
