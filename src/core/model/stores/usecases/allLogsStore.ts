@@ -1,6 +1,7 @@
-import { Ref } from 'vue';
 import { Log } from '../../log';
 
 export type AllLogsStore = {
-  getLogRef: () => Ref<Log>;
+  getLogRef: () => Log;
+  setShowNames: (enabled: boolean) => void;
+  getShowNames: () => boolean;
 };

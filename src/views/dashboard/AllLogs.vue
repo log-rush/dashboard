@@ -6,7 +6,10 @@
         <n-space justify="end" align="center" :wrap="false">
           <n-space align="center" :wrap="false">
             <n-p>Show Names</n-p>
-            <n-switch></n-switch>
+            <n-switch
+              :value="showNames"
+              @update:value="updateShowNames"
+            ></n-switch>
           </n-space>
         </n-space>
       </n-space>
@@ -21,24 +24,29 @@ import { NSpace, NSwitch, NP } from 'naive-ui';
 import { ref, watch } from 'vue';
 import { LogFormat, LogFormatter, Optimization } from '@log-rush/log-formatter';
 import { useAllLogs } from '@/core/stores/root';
+import { computed } from '@vue/reactivity';
 
-const logs = useAllLogs();
+const allLogsStore = useAllLogs();
 
 const wrapper = ref<HTMLDivElement | null>();
+const showNames = computed(() => allLogsStore.getShowNames());
 const formatter = new LogFormatter({
   format: LogFormat.ColoredHtml,
   optimizations: Optimization.O2,
 });
 
 watch(
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  logs.getLogRef()!,
+  () => allLogsStore.getLogRef(),
   (newLog) => {
     if (newLog) {
       appendLog(newLog.message);
     }
   },
 );
+
+const updateShowNames = (enabled: boolean) => {
+  allLogsStore.setShowNames(enabled);
+};
 
 const appendLog = (data: string) => {
   const formatted = formatter.format(data);

@@ -11,12 +11,13 @@ const createStore: CreateStoreFunc<'allLogs', StorageKeys.NonPersistent> = ({
       stores.logStreams.getSubscribedStreams(),
     );
 
-    watch(subscribedStreams, (streams, lastStreams) => {
-      updateWatcher(streams, lastStreams);
+    watch(subscribedStreams, (streams) => {
+      updateWatcher(streams);
     });
   };
 
   const logRef = ref<Log>({} as Log);
+  const showNamesRef = ref<boolean>(true);
   const watchers: Record<
     string,
     {
@@ -25,12 +26,9 @@ const createStore: CreateStoreFunc<'allLogs', StorageKeys.NonPersistent> = ({
     }
   > = {};
 
-  const updateWatcher = (
-    current: LogStreamRecord[],
-    last: LogStreamRecord[],
-  ) => {
-    for (const stream of last) {
-      watchers[stream.id].flagged = true;
+  const updateWatcher = (current: LogStreamRecord[]) => {
+    for (const id of Object.keys(watchers)) {
+      watchers[id].flagged = true;
     }
     for (const stream of current) {
       if (stream.id in watchers) {
@@ -40,8 +38,12 @@ const createStore: CreateStoreFunc<'allLogs', StorageKeys.NonPersistent> = ({
           unwatch: watch(
             () => stores.logs.getLastLog(stream.id),
             (log) => {
-              console.log('should fire');
-              if (log) {
+              if (log && showNamesRef.value) {
+                logRef.value = {
+                  message: `${stream.alias} | ${log.message}`,
+                  timestamp: log.timestamp,
+                };
+              } else if (log) {
                 logRef.value = log;
               }
             },
@@ -59,11 +61,15 @@ const createStore: CreateStoreFunc<'allLogs', StorageKeys.NonPersistent> = ({
   };
 
   const getLogRef = () => {
-    return logRef;
+    return logRef.value;
   };
 
   const store = {
     getLogRef,
+    setShowNames: (showNames: boolean) => {
+      showNamesRef.value = showNames;
+    },
+    getShowNames: () => showNamesRef.value,
   };
 
   return {
