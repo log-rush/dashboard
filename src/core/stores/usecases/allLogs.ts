@@ -64,7 +64,26 @@ const createStore: CreateStoreFunc<'allLogs', StorageKeys.NonPersistent> = ({
     return logRef.value;
   };
 
+  const getLogs = () => {
+    console.log('collecting logs');
+    return stores.logStreams
+      .getSubscribedStreams()
+      .flatMap((stream) =>
+        (stores.logs.getLogs(stream.id) ?? []).map((log) => {
+          if (showNamesRef.value) {
+            return {
+              message: `${stream.alias} | ${log.message}`,
+              timestamp: log.timestamp,
+            };
+          }
+          return log;
+        }),
+      )
+      .sort((a, b) => a.timestamp - b.timestamp);
+  };
+
   const store = {
+    getLogs,
     getLogRef,
     setShowNames: (showNames: boolean) => {
       showNamesRef.value = showNames;

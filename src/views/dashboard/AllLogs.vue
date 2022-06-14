@@ -21,7 +21,7 @@
 import '@log-rush/log-formatter/dist/index.css';
 import PageLayout from '@/components/util/PageLayout.vue';
 import { NSpace, NSwitch, NP } from 'naive-ui';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { LogFormat, LogFormatter, Optimization } from '@log-rush/log-formatter';
 import { useAllLogs } from '@/core/stores/root';
 import { computed } from '@vue/reactivity';
@@ -43,6 +43,13 @@ watch(
     }
   },
 );
+
+onMounted(() => {
+  const storedLogs = allLogsStore.getLogs();
+  for (const log of storedLogs) {
+    appendLog(log.message);
+  }
+});
 
 const updateShowNames = (enabled: boolean) => {
   allLogsStore.setShowNames(enabled);
