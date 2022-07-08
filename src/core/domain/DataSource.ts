@@ -1,7 +1,7 @@
+import { InjectionKey, Injector } from '../Injector';
 import { ConnectionStatus, DataSourceRecord } from '../model/dataSource';
 import { LogRecord } from '../model/log';
 import { DataSourceConnection } from '../services/DataSourceConnection';
-import { DataSourcesService } from '../services/dataSourceService';
 
 interface DataSourceUpdateHandler {
   onLog(stream: string, log: LogRecord): void;
@@ -34,7 +34,9 @@ export class DataSource implements DataSourceRecord {
   }
 
   static async create(url: string): Promise<DataSource | undefined> {
-    const data = await DataSourcesService.getDataSource(url);
+    const data = await Injector.get(
+      InjectionKey.DataSourcesService,
+    ).getDataSource(url);
     if (data) {
       return new DataSource(data.id, url, data.name, data.version);
     }
