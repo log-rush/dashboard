@@ -4,7 +4,7 @@ import {
   LogStreamResponse,
 } from '../model/api/httpTypes';
 
-export const DataSourcesService = {
+export const DataSourcesHttpService = {
   async getDataSource(
     dsUrl: string,
   ): Promise<DataSourceInfoResponse | undefined> {
