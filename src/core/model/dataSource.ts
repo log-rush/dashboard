@@ -1,10 +1,10 @@
-export type DataSource = {
+export interface DataSourceInterface {
   id: string;
   url: string;
   name: string;
   version: string;
   status: ConnectionStatus;
-};
+}
 
 export type StoredDataSource = {
   id: string;

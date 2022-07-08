@@ -1,10 +1,10 @@
-import { DataSource } from '../dataSource';
+import { DataSourceInterface } from '../dataSource';
 
 export type DataSourcesStore = {
-  allDataSources: () => DataSource[];
+  allDataSources: () => DataSourceInterface[];
   createDataSource: (url: string) => Promise<boolean>;
   deleteDataSource: (id: string) => void;
   reconnect: (id: string) => void;
-  getDataSource: (id: string | undefined) => DataSource | undefined;
+  getDataSource: (id: string | undefined) => DataSourceInterface | undefined;
   connectToDataSource: (id: string) => void;
 };

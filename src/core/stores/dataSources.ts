@@ -1,5 +1,5 @@
 import { DataSourceConnection } from '../services/DataSourceConnection';
-import { DataSource, StoredDataSource } from '../model/dataSource';
+import { DataSourceInterface, StoredDataSource } from '../model/dataSource';
 import { DataSourcesService } from '../services/dataSourceService';
 import { CreateStoreFunc, StorageKeys } from './util/type';
 import { Log } from '../model/log';
@@ -63,8 +63,9 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
     }
   };
 
-  const getDataSource = (id: string | undefined): DataSource | undefined =>
-    dataSources[id ?? ''];
+  const getDataSource = (
+    id: string | undefined,
+  ): DataSourceInterface | undefined => dataSources[id ?? ''];
 
   const connectDataSource = (id: string) => {
     if (!connections[id] && getDataSource(id)) {
