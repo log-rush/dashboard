@@ -1,15 +1,16 @@
 import { ConnectionStatus } from './dataSource';
 
-export type LogStream = {
+export interface LogStreamRecord {
   id: string;
   alias: string;
   dataSource: string;
   status: ConnectionStatus;
-};
-
-export type LogStreamRecord = LogStream & {
   isSubscribed: boolean;
   fromCache: boolean;
-};
+}
 
-export type StoredLogStream = Omit<LogStream, 'status'>;
+export interface StoredLogStream {
+  id: string;
+  alias: string;
+  dataSource: string;
+}

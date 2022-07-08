@@ -1,6 +1,6 @@
 import { Socket } from '../api/ws/socket';
 import { ConnectionStatus } from '../model/dataSource';
-import { Log } from '../model/log';
+import { LogRecord } from '../model/log';
 import { LRPCoder, LRPOperation } from './LRPCoder';
 
 export class DataSourceConnection {
@@ -13,7 +13,7 @@ export class DataSourceConnection {
   private shouldReconnect = true;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private logHandler: (stream: string, log: Log) => void = () => {};
+  private logHandler: (stream: string, log: LogRecord) => void = () => {};
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private statusUpdateHandler: (status: ConnectionStatus) => void = () => {};
@@ -56,7 +56,7 @@ export class DataSourceConnection {
     );
   }
 
-  public setLogHandler(handler: (stream: string, log: Log) => void) {
+  public setLogHandler(handler: (stream: string, log: LogRecord) => void) {
     this.logHandler = handler;
   }
 

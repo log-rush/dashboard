@@ -1,14 +1,14 @@
-import { ConnectionStatus, DataSourceInterface } from '../model/dataSource';
-import { Log } from '../model/log';
+import { ConnectionStatus, DataSourceRecord } from '../model/dataSource';
+import { LogRecord } from '../model/log';
 import { DataSourceConnection } from '../services/DataSourceConnection';
 import { DataSourcesService } from '../services/dataSourceService';
 
 interface DataSourceUpdateHandler {
-  onLog(stream: string, log: Log): void;
+  onLog(stream: string, log: LogRecord): void;
   onStatus(status: ConnectionStatus): void;
 }
 
-export class DataSource implements DataSourceInterface {
+export class DataSource implements DataSourceRecord {
   private _connection: DataSourceConnection | undefined = undefined;
   private updateHandler: DataSourceUpdateHandler;
   private _connectionStatus: ConnectionStatus = 'disconnected';

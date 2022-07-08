@@ -1,7 +1,7 @@
-import { Log } from '../log';
+import { LogRecord } from '../log';
 
 export type LogsStore = {
-  getLogs: (stream: string) => Log[];
-  getLastLog: (stream: string) => Log | undefined;
+  getLogs: (stream: string) => LogRecord[];
+  getLastLog: (stream: string) => LogRecord | undefined;
   clearLogs: (streamId: string) => void;
 };

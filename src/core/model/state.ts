@@ -1,13 +1,13 @@
 import { DataSourceConnection } from '../services/DataSourceConnection';
 import { Config } from './config';
-import { DataSourceInterface } from './dataSource';
-import { LogRecord } from './Log';
+import { DataSourceRecord } from './dataSource';
+import { LogHistory } from './Log';
 import { LogStreamRecord } from './logStream';
 
 export type ReactiveState = {
-  dataSources: Record<string, DataSourceInterface>;
+  dataSources: Record<string, DataSourceRecord>;
   logStreams: Record<string, Record<string, LogStreamRecord>>;
-  logs: Record<string, LogRecord>;
+  logs: Record<string, LogHistory>;
   config: Config;
 };
 

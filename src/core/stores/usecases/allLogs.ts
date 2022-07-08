@@ -1,4 +1,4 @@
-import { Log } from '@/core/model/log';
+import { LogRecord } from '@/core/model/log';
 import { LogStreamRecord } from '@/core/model/logStream';
 import { computed, ref, watch } from 'vue';
 import { CreateStoreFunc, StorageKeys } from '../util/type';
@@ -16,7 +16,7 @@ const createStore: CreateStoreFunc<'allLogs', StorageKeys.NonPersistent> = ({
     });
   };
 
-  const logRef = ref<Log>({} as Log);
+  const logRef = ref<LogRecord>({} as LogRecord);
   const showNamesRef = ref<boolean>(true);
   const watchers: Record<
     string,

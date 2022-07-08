@@ -1,4 +1,4 @@
-import { Log } from '../model/log';
+import { LogRecord } from '../model/log';
 import { CreateStoreFunc, StorageKeys } from './util/type';
 
 const createStore: CreateStoreFunc<'logs', StorageKeys.NonPersistent> = ({
@@ -6,7 +6,7 @@ const createStore: CreateStoreFunc<'logs', StorageKeys.NonPersistent> = ({
 }) => {
   const { logs } = reactiveState;
 
-  const getLogs = (stream: string): Log[] => {
+  const getLogs = (stream: string): LogRecord[] => {
     return logs[stream].logs;
   };
 

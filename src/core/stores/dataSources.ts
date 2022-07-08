@@ -1,8 +1,8 @@
 import { DataSourceConnection } from '../services/DataSourceConnection';
-import { DataSourceInterface, StoredDataSource } from '../model/dataSource';
+import { DataSourceRecord, StoredDataSource } from '../model/dataSource';
 import { DataSourcesService } from '../services/dataSourceService';
 import { CreateStoreFunc, StorageKeys } from './util/type';
-import { Log } from '../model/log';
+import { LogRecord } from '../model/log';
 
 const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
   reactiveState,
@@ -65,7 +65,7 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
 
   const getDataSource = (
     id: string | undefined,
-  ): DataSourceInterface | undefined => dataSources[id ?? ''];
+  ): DataSourceRecord | undefined => dataSources[id ?? ''];
 
   const connectDataSource = (id: string) => {
     if (!connections[id] && getDataSource(id)) {
@@ -93,7 +93,7 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
     return connection;
   };
 
-  const logHandler = (stream: string, log: Log) => {
+  const logHandler = (stream: string, log: LogRecord) => {
     reactiveState.logs[stream].logs.push(log);
     reactiveState.logs[stream].lastLog = log;
   };

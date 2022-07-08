@@ -1,4 +1,4 @@
-export interface DataSourceInterface {
+export interface DataSourceRecord {
   id: string;
   url: string;
   name: string;
@@ -6,12 +6,12 @@ export interface DataSourceInterface {
   status: ConnectionStatus;
 }
 
-export type StoredDataSource = {
+export interface StoredDataSource {
   id: string;
   url: string;
   name: string;
   version: string;
-};
+}
 
 export type ConnectionStatus =
   | 'disconnected'

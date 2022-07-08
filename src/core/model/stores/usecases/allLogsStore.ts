@@ -1,8 +1,8 @@
-import { Log } from '../../log';
+import { LogRecord } from '../../log';
 
 export type AllLogsStore = {
-  getLogs: () => Log[];
-  getLogRef: () => Log;
+  getLogs: () => LogRecord[];
+  getLogRef: () => LogRecord;
   setShowNames: (enabled: boolean) => void;
   getShowNames: () => boolean;
 };

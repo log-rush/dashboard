@@ -1,9 +1,9 @@
-export type Log = {
+export interface LogRecord {
   timestamp: number;
   message: string;
-};
+}
 
-export type LogRecord = {
-  logs: Log[];
-  lastLog: Log | undefined;
-};
+export interface LogHistory {
+  logs: LogRecord[];
+  lastLog: LogRecord | undefined;
+}
