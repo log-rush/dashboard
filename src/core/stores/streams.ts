@@ -17,7 +17,7 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
       JSON.stringify(
         Object.keys(reactiveState.logStreams).flatMap((id) =>
           Object.values(reactiveState.logStreams[id])
-            .filter((ls) => ls.isSubscribed || ls.fromCache)
+            .filter((ls) => ls.isSubscribed || ls.isCached)
             .map(
               (ls): StoredLogStream => ({
                 id: ls.id,
@@ -47,7 +47,7 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
       if (logStreams[dsId][stream.id]) {
         if (logStreams[dsId][stream.id].isSubscribed) {
           logStreams[dsId][stream.id].status = 'connected';
-        } else if (logStreams[dsId][stream.id].fromCache) {
+        } else if (logStreams[dsId][stream.id].isCached) {
           logStreams[dsId][stream.id].status = 'available';
         }
         continue;
@@ -57,14 +57,14 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
         dataSource: dsId,
         status: 'available',
         isSubscribed: false,
-        fromCache: false,
+        isCached: false,
       };
       stores.logs.clearLogs(stream.id);
     }
 
     for (const stream of Object.values(logStreams[dsId])) {
       if (
-        stream.fromCache === true &&
+        stream.isCached === true &&
         stream.status !== 'connected' &&
         stream.status !== 'available'
       ) {
@@ -126,7 +126,7 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
 
   const getCachedStreamsForDataSource = (dsId: string): LogStreamRecord[] => {
     return (Object.values(logStreams[dsId]) ?? []).filter(
-      (stream) => stream.fromCache,
+      (stream) => stream.isCached,
     );
   };
 
@@ -139,7 +139,7 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
         logStreams[ls.dataSource][ls.id] = {
           ...ls,
           isSubscribed: false,
-          fromCache: true,
+          isCached: true,
           status: 'connecting',
         };
         // fetch current state

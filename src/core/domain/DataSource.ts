@@ -1,7 +1,8 @@
-import { InjectionKey, Injector } from '../Injector';
-import { ConnectionStatus, DataSourceRecord } from '../model/dataSource';
-import { LogRecord } from '../model/log';
-import { DataSourceConnection } from '../services/DataSourceConnection';
+import { ConnectionStatus, DataSourceRecord } from '@/core/model/dataSource';
+import { DataSourceConnection } from '@/core/services/DataSourceConnection';
+import { LogStreamResponse } from '@/core/model/api/httpTypes';
+import { InjectionKey, Injector } from '@/core/Injector';
+import { LogRecord } from '@/core/model/log';
 
 interface DataSourceUpdateHandler {
   onLog(stream: string, log: LogRecord): void;
@@ -65,6 +66,31 @@ export class DataSource implements DataSourceRecord {
   public reconnect() {
     if (this._connection) {
       this._connection.tryReConnect();
+    }
+  }
+
+  public async listStreams(): Promise<LogStreamResponse[]> {
+    return await Injector.get(InjectionKey.DataSourcesService).getStreams(
+      this.url,
+    );
+  }
+
+  public async getStream(id: string): Promise<LogStreamResponse | undefined> {
+    return await Injector.get(InjectionKey.LogStreamsService).getStream(
+      this.url,
+      id,
+    );
+  }
+
+  public subscribe(streamId: string) {
+    if (this._connection) {
+      this._connection.subscribe(streamId);
+    }
+  }
+
+  public unsubscribe(streamId: string) {
+    if (this._connection) {
+      this._connection.unsubscribe(streamId);
     }
   }
 }
