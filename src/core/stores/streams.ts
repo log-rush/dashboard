@@ -1,3 +1,4 @@
+import { LogStream } from '../domain/LogStream';
 import { LogStreamRecord, StoredLogStream } from '../model/logStream';
 import { CreateStoreFunc, StorageKeys } from './util/type';
 
@@ -5,7 +6,7 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
   reactiveState,
   stores,
 }) => {
-  const { logStreams, dataSources } = reactiveState;
+  const { logStreams } = reactiveState;
 
   const saveState = () => {
     localStorage.setItem(
@@ -14,13 +15,7 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
         Object.keys(reactiveState.logStreams).flatMap((id) =>
           Object.values(reactiveState.logStreams[id])
             .filter((ls) => ls.isSubscribed || ls.isCached)
-            .map(
-              (ls): StoredLogStream => ({
-                id: ls.id,
-                alias: ls.alias,
-                dataSource: ls.dataSource,
-              }),
-            ),
+            .map((ls) => ls.toStorageRecord()),
         ),
       ),
     );
@@ -29,11 +24,41 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
   const getStreamsForDataSource = async (
     dsId: string,
   ): Promise<LogStreamRecord[]> => {
-    const ds = stores.dataSources.getDataSource(dsId);
+    const ds = stores.dataSources.getRawDataSource(dsId);
     if (!ds) {
       return [];
     }
-    return [];
+    // TODO: set state to loading temp? (or only cached ones)
+    const allStreams: LogStreamRecord[] = [];
+    const streams = await ds.listStreams();
+    console.log(streams);
+    for (const stream of streams) {
+      if (stream.id in logStreams[dsId]) {
+        // stream already existing
+        if (logStreams[dsId][stream.id].isCached) {
+          // handle cached stream
+          const newStream = await logStreams[dsId][stream.id].revokeCacheStatus(
+            ds,
+          );
+          if (newStream) {
+            logStreams[dsId][stream.id] = newStream;
+          }
+        }
+        allStreams.push(logStreams[dsId][stream.id]);
+        continue;
+      } else {
+        // new stream
+        const newStream = await LogStream.create(ds, stream.id);
+        console.log(newStream);
+        if (newStream) {
+          allStreams.push(newStream);
+          logStreams[dsId][stream.id] = newStream;
+          stores.logs.clearLogs(stream.id);
+        }
+      }
+    }
+    console.log(allStreams);
+    return allStreams;
 
     //for (const key of Object.keys(logStreams[dsId])) {
     //  logStreams[dsId][key].status = 'connecting';
@@ -78,6 +103,7 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
   };
 
   const subscribe = (ofDataSourceId: string, stream: string) => {
+    logStreams[ofDataSourceId]?.[stream]?.subscribe();
     //if (
     //  logStreams[ofDataSourceId]?.[stream] &&
     //  !logStreams[ofDataSourceId]?.[stream].isSubscribed
@@ -96,6 +122,7 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
   };
 
   const unsubscribe = (ofDataSourceId: string, stream: string) => {
+    logStreams[ofDataSourceId]?.[stream]?.unsubscribe();
     //if (logStreams[ofDataSourceId]?.[stream]) {
     //  const ds = dataSources[ofDataSourceId ?? ''];
     //  if (!ds) return;

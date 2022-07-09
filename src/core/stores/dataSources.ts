@@ -100,6 +100,7 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
     createDataSource,
     deleteDataSource,
     getDataSource,
+    getRawDataSource,
     reconnect,
   };
 

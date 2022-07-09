@@ -1,12 +1,12 @@
 import { UnwrapNestedRefs } from 'vue';
 import { DataSource } from '../domain/DataSource';
+import { LogStream } from '../domain/LogStream';
 import { Config } from './config';
 import { LogHistory } from './Log';
-import { LogStreamRecord } from './logStream';
 
 export type ReactiveState = {
   dataSources: Record<string, UnwrapNestedRefs<DataSource>>;
-  logStreams: Record<string, Record<string, LogStreamRecord>>;
+  logStreams: Record<string, Record<string, UnwrapNestedRefs<LogStream>>>;
   logs: Record<string, LogHistory>;
   config: Config;
 };

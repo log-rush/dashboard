@@ -1,3 +1,5 @@
+import { DataSource } from '@/core/domain/DataSource';
+import { UnwrapNestedRefs } from 'vue';
 import { DataSourceRecord } from '../dataSource';
 
 export type DataSourcesStore = {
@@ -6,5 +8,8 @@ export type DataSourcesStore = {
   deleteDataSource: (id: string) => void;
   reconnect: (id: string) => void;
   getDataSource: (id: string | undefined) => DataSourceRecord | undefined;
+  getRawDataSource: (
+    id: string | undefined,
+  ) => UnwrapNestedRefs<DataSource> | undefined;
   connectToDataSource: (id: string) => void;
 };
