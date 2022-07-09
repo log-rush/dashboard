@@ -72,4 +72,15 @@ export class LogStream implements LogStreamRecord {
     }
     return undefined;
   }
+
+  public subscribeTemporary(): () => void {
+    if (!this._isSubscribed && this._dataSource) {
+      this._dataSource.subscribe(this.id);
+    }
+    return () => {
+      if (!this._isSubscribed && this._dataSource) {
+        this._dataSource.unsubscribe(this.id);
+      }
+    };
+  }
 }

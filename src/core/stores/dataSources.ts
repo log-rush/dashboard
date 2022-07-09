@@ -1,43 +1,38 @@
-import { DataSourceConnection } from '../services/DataSourceConnection';
-import { DataSourceRecord, StoredDataSource } from '../model/dataSource';
-import { DataSourcesService } from '../services/dataSourceService';
+import { UnwrapNestedRefs } from 'vue';
+import { DataSourceRecord, StoredDataSource } from '@/core/model/dataSource';
 import { CreateStoreFunc, StorageKeys } from './util/type';
-import { LogRecord } from '../model/log';
+import { DataSource } from '@/core/domain/DataSource';
+import { LogRecord } from '@/core/model/log';
 
 const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
   reactiveState,
-  staticState,
-  stores,
 }) => {
   const { dataSources, logStreams } = reactiveState;
-  const { connections } = staticState;
 
   const saveState = () => {
     localStorage.setItem(
       StorageKeys.DataSources,
       JSON.stringify(
-        Object.values(reactiveState.dataSources).map(
-          (ds): StoredDataSource => ({
-            id: ds.id,
-            name: ds.name,
-            url: ds.url,
-            version: ds.version,
-          }),
+        Object.values(reactiveState.dataSources).map((ds) =>
+          ds.toStorageRecord(),
         ),
       ),
     );
   };
 
+  const getRawDataSource = (
+    id: string | undefined,
+  ): UnwrapNestedRefs<DataSource | undefined> => dataSources[id ?? ''];
+
+  const getDataSource = (
+    id: string | undefined,
+  ): DataSourceRecord | undefined => getRawDataSource(id)?.toRecord();
+
   const createDataSource = async (url: string): Promise<boolean> => {
-    const dataSource = await DataSourcesService.getDataSource(url);
+    const dataSource = await DataSource.create(url);
     if (dataSource) {
-      dataSources[dataSource.id] = {
-        ...dataSource,
-        url: url,
-        status: 'disconnected',
-      };
+      dataSources[dataSource.id] = dataSource;
       logStreams[dataSource.id] = {};
-      connections[dataSource.id] = createConnection(dataSource.id, url);
       saveState();
       return true;
     }
@@ -48,50 +43,35 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
     const ds = dataSources[id];
 
     if (ds) {
-      connections[ds.id].close();
+      ds.disconnect();
       delete dataSources[ds.id];
-      delete connections[ds.id];
       saveState();
     }
   };
 
-  const reconnect = (id: string) => {
-    const ds = dataSources[id];
-
-    if (ds) {
-      connections[ds.id].tryReConnect();
-    }
-  };
-
-  const getDataSource = (
-    id: string | undefined,
-  ): DataSourceRecord | undefined => dataSources[id ?? ''];
-
   const connectDataSource = (id: string) => {
-    if (!connections[id] && getDataSource(id)) {
-      connections[id] = createConnection(id, getDataSource(id)?.url ?? '');
-    } else {
-      connections[id]?.tryReConnect();
-    }
+    getRawDataSource(id)?.connect({
+      onLog: logHandler,
+    });
+    // TODO: handle cached subscriptions
+
+    // if (!connections[id] && getDataSource(id)) {
+    //   connections[id] = createConnection(id, getDataSource(id)?.url ?? '');
+    // } else {
+    //   connections[id]?.tryReConnect();
+    // }
   };
 
-  const createConnection = (id: string, url: string): DataSourceConnection => {
-    const connection = new DataSourceConnection(id, url.split('://')[1]);
-    connection.setLogHandler(logHandler);
-    connection.setStatusUpdateHandler((status) => {
-      if (dataSources[id]) {
-        dataSources[id].status = status;
-      }
-    });
-
-    stores.logStreams.getCachedStreamsForDataSource(id).forEach((stream) => {
-      connection.subscribe(stream.id);
-      stores.logs.clearLogs(stream.id);
-      stream.isSubscribed = true;
-      stream.status = 'connected';
-    });
-    return connection;
+  const reconnect = (id: string) => {
+    getRawDataSource(id)?.reconnect();
   };
+
+  //  stores.logStreams.getCachedStreamsForDataSource(id).forEach((stream) => {
+  //    connection.subscribe(stream.id);
+  //    stores.logs.clearLogs(stream.id);
+  //    stream.isSubscribed = true;
+  //    stream.status = 'connected';
+  //  });
 
   const logHandler = (stream: string, log: LogRecord) => {
     reactiveState.logs[stream].logs.push(log);
@@ -105,32 +85,17 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
     if (!storedSources) return;
 
     const parsedDataSources = JSON.parse(storedSources) as StoredDataSource[];
-    for (const ds of parsedDataSources) {
-      DataSourcesService.getDataSource(ds.url).then((fetchedDataSource) => {
-        if (fetchedDataSource) {
-          if (fetchedDataSource.id !== ds.id) {
-            deleteDataSource(ds.id);
-            createDataSource(ds.url);
-          } else {
-            dataSources[ds.id].name = fetchedDataSource.name;
-            dataSources[ds.id].version = fetchedDataSource.version;
-          }
-          if (!connections[ds.id]) {
-            dataSources[ds.id].status = 'available';
-          }
-        }
+    for (const _cachedDs of parsedDataSources) {
+      DataSource.createFromCache(_cachedDs).then((ds) => {
+        dataSources[ds.id] = ds;
+        logStreams[ds.id] = logStreams[ds.id] ?? {}; // TODO: handle this in logStreams store
+        saveState();
       });
-      dataSources[ds.id] = {
-        ...ds,
-        status: 'disconnected',
-      };
-      logStreams[ds.id] = logStreams[ds.id] ?? {};
     }
-    saveState();
   };
 
   const Store = {
-    allDataSources: () => Object.values(dataSources),
+    allDataSources: () => Object.values(dataSources).map((ds) => ds.toRecord()),
     connectToDataSource: connectDataSource,
     createDataSource,
     deleteDataSource,

@@ -1,34 +1,53 @@
-import { ConnectionStatus, DataSourceRecord } from '@/core/model/dataSource';
+import {
+  ConnectionStatus,
+  DataSourceRecord,
+  StoredDataSource,
+} from '@/core/model/dataSource';
 import { DataSourceConnection } from '@/core/services/DataSourceConnection';
 import { LogStreamResponse } from '@/core/model/api/httpTypes';
 import { InjectionKey, Injector } from '@/core/Injector';
 import { LogRecord } from '@/core/model/log';
+import { RecordAble, StorageRecordAble } from '../model/helper';
 
 interface DataSourceUpdateHandler {
   onLog(stream: string, log: LogRecord): void;
-  onStatus(status: ConnectionStatus): void;
 }
 
-export class DataSource implements DataSourceRecord {
+export class DataSource
+  implements RecordAble<DataSourceRecord>, StorageRecordAble<StoredDataSource>
+{
   private _connection: DataSourceConnection | undefined = undefined;
-  private updateHandler: DataSourceUpdateHandler;
+  private _updateHandler: DataSourceUpdateHandler;
   private _connectionStatus: ConnectionStatus = 'disconnected';
 
-  get status(): ConnectionStatus {
+  public get id(): string {
+    return this._id;
+  }
+
+  public get url(): string {
+    return this._url;
+  }
+
+  public get name(): string {
+    return this._name;
+  }
+
+  public get version(): string {
+    return this._version;
+  }
+
+  public get status(): ConnectionStatus {
     return this._connectionStatus;
   }
 
   private constructor(
-    public readonly id: string,
-    public readonly url: string,
-    public readonly name: string,
-    public readonly version: string,
+    private _id: string,
+    private _url: string,
+    private _name: string,
+    private _version: string,
   ) {
-    this.updateHandler = {
+    this._updateHandler = {
       onLog() {
-        return;
-      },
-      onStatus() {
         return;
       },
     };
@@ -39,13 +58,32 @@ export class DataSource implements DataSourceRecord {
       InjectionKey.DataSourcesService,
     ).getDataSource(url);
     if (data) {
-      return new DataSource(data.id, url, data.name, data.version);
+      const ds = new DataSource(data.id, url, data.name, data.version);
+      ds._connectionStatus = 'available';
+      return ds;
     }
     return undefined;
   }
 
+  static async createFromCache(data: StoredDataSource): Promise<DataSource> {
+    const ds = new DataSource(data.id, data.url, data.name, data.version);
+    ds._connectionStatus = 'disconnected';
+
+    console.log('test', data);
+    const newData = await Injector.get(
+      InjectionKey.DataSourcesService,
+    ).getDataSource(data.url);
+    if (newData) {
+      ds._id = newData.id;
+      ds._name = newData.name;
+      ds._version = newData.version;
+      ds._connectionStatus = 'available';
+    }
+    return ds;
+  }
+
   public connect(handler: DataSourceUpdateHandler) {
-    this.updateHandler = handler;
+    this._updateHandler = handler;
     if (!this._connection) {
       this._connection = new DataSourceConnection(
         this.id,
@@ -53,7 +91,9 @@ export class DataSource implements DataSourceRecord {
       );
     }
     this._connection.setLogHandler(handler.onLog);
-    this._connection.setStatusUpdateHandler(handler.onStatus);
+    this._connection.setStatusUpdateHandler((status) => {
+      this._connectionStatus = status;
+    });
   }
 
   public disconnect() {
@@ -92,5 +132,24 @@ export class DataSource implements DataSourceRecord {
     if (this._connection) {
       this._connection.unsubscribe(streamId);
     }
+  }
+
+  toRecord(): DataSourceRecord {
+    return {
+      id: this.id,
+      name: this.name,
+      status: this.status,
+      url: this.url,
+      version: this.version,
+    };
+  }
+
+  toStorageRecord(): StoredDataSource {
+    return {
+      id: this.id,
+      name: this.name,
+      url: this.url,
+      version: this.version,
+    };
   }
 }

@@ -20,9 +20,7 @@ const reactiveState = reactive<ReactiveState>({
   config: {} as Config,
 });
 
-const staticState: StaticState = {
-  connections: {},
-};
+const staticState: StaticState = {};
 
 const stores: Stores = {
   config: {} as ConfigStore,

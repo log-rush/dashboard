@@ -25,7 +25,7 @@ const _overrideValues: Partial<InjectedValueMap> = {
 
 export const Injector = {
   get: <K extends InjectionKey>(key: K): InjectedValueMap[K] => {
-    return _overrideValues[key] ?? _injectedValues[key];
+    return /* _overrideValues[key] ??*/ _injectedValues[key];
   },
   mock: <K extends InjectionKey>(key: K, value: InjectedValueMap[K]) => {
     _overrideValues[key] = value;
