@@ -1,5 +1,5 @@
 import { ConnectionStatus } from '../model/dataSource';
-import { LogStreamRecord } from '../model/logStream';
+import { LogStreamRecord, StoredLogStream } from '../model/logStream';
 import { DataSource } from './DataSource';
 
 export class LogStream implements LogStreamRecord {
@@ -20,13 +20,13 @@ export class LogStream implements LogStreamRecord {
   }
 
   get dataSource(): string {
-    return this._dataSource.id;
+    return this._dataSource?.id ?? '__none__';
   }
 
   private constructor(
     public readonly id: string,
     public readonly alias: string,
-    private readonly _dataSource: DataSource,
+    private readonly _dataSource?: DataSource,
   ) {}
 
   public static async create(
@@ -40,15 +40,36 @@ export class LogStream implements LogStreamRecord {
     return undefined;
   }
 
+  public static async createFromCache(
+    data: StoredLogStream,
+  ): Promise<LogStream | undefined> {
+    const stream = new LogStream(data.id, data.alias, undefined);
+    stream._isCached = true;
+    return stream;
+  }
+
   public subscribe() {
-    if (!this._isSubscribed) {
+    if (!this._isSubscribed && this._dataSource) {
       this._dataSource.subscribe(this.id);
+      this._isSubscribed = true;
     }
   }
 
   public unsubscribe() {
-    if (this._isSubscribed) {
+    if (this._isSubscribed && this._dataSource) {
       this._dataSource.unsubscribe(this.id);
+      this._isSubscribed = false;
     }
+  }
+
+  public async revokeCacheStatus(
+    dataSource: DataSource,
+  ): Promise<LogStream | undefined> {
+    const stream = await LogStream.create(dataSource, this.id);
+    if (stream) {
+      stream.subscribe();
+      return stream;
+    }
+    return undefined;
   }
 }
