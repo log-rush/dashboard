@@ -83,14 +83,16 @@ export class LogStream
     return undefined;
   }
 
-  public subscribeTemporary(): () => void {
+  public subscribeTemporary(): () => boolean {
     if (!this._isSubscribed && this._dataSource) {
       this._dataSource.subscribe(this.id);
     }
     return () => {
       if (!this._isSubscribed && this._dataSource) {
         this._dataSource.unsubscribe(this.id);
+        return true;
       }
+      return false;
     };
   }
 

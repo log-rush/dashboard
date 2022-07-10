@@ -104,34 +104,22 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
 
   const subscribe = (ofDataSourceId: string, stream: string) => {
     logStreams[ofDataSourceId]?.[stream]?.subscribe();
-    //if (
-    //  logStreams[ofDataSourceId]?.[stream] &&
-    //  !logStreams[ofDataSourceId]?.[stream].isSubscribed
-    //) {
-    //  logStreams[ofDataSourceId][stream].status = 'connecting';
-    //  const ds = dataSources[ofDataSourceId ?? ''];
-    //  if (!ds || !connections[ds.id]) {
-    //    logStreams[ofDataSourceId][stream].status = 'error';
-    //    return;
-    //  }
-    //  connections[ds.id].subscribe(stream);
-    //  logStreams[ofDataSourceId][stream].isSubscribed = true;
-    //  logStreams[ofDataSourceId][stream].status = 'connected';
-    //  saveState();
-    //}
+    saveState();
   };
 
   const unsubscribe = (ofDataSourceId: string, stream: string) => {
     logStreams[ofDataSourceId]?.[stream]?.unsubscribe();
-    //if (logStreams[ofDataSourceId]?.[stream]) {
-    //  const ds = dataSources[ofDataSourceId ?? ''];
-    //  if (!ds) return;
-    //  connections[ds.id].unsubscribe(stream);
-    //  logStreams[ofDataSourceId][stream].isSubscribed = false;
-    //  logStreams[ofDataSourceId][stream].status = 'available';
-    //  stores.logs.clearLogs(stream);
-    //  saveState();
-    //}
+    stores.logs.clearLogs(stream);
+    saveState();
+  };
+
+  const subscribeTemp = (ofDataSourceId: string, stream: string) => {
+    const close = logStreams[ofDataSourceId]?.[stream]?.subscribeTemporary();
+    return () => {
+      if (close()) {
+        stores.logs.clearLogs(stream);
+      }
+    };
   };
 
   const getSubscribedStreams = (): LogStreamRecord[] => {
@@ -190,6 +178,7 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
     getSubscribedStreamsForDataSource,
     getCachedStreamsForDataSource,
     subscribe,
+    subscribeTemp,
     unsubscribe,
   };
 

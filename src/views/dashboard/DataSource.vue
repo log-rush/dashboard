@@ -62,7 +62,7 @@
           </n-empty>
         </n-space>
       </n-space>
-      <LogPeekModal :stream="openLogPeekStream" @close="closeLogPeek()" />
+      <LogPeekModal :stream="logPeekStream" @close="closeLogPeek()" />
     </template>
     <template v-else>
       <n-empty description="DataSource ot found"> </n-empty>
@@ -109,7 +109,7 @@ import {
 } from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
 import { onMounted, ref } from 'vue';
-import { ConnectionStatus, DataSource } from '@/core/model/dataSource';
+import { ConnectionStatus, DataSourceRecord } from '@/core/model/dataSource';
 import Status from '@/components/util/Status.vue';
 import { useRoute, useRouter } from 'vue-router';
 import LogPeekModal from '@/components/streams/modals/LogPeekModal.vue';
@@ -121,9 +121,10 @@ const logStreamStore = useLogStreams();
 const dialog = useDialog();
 const route = useRoute();
 const router = useRouter();
-const dataSource = ref<DataSource | undefined>(undefined);
+const dataSource = ref<DataSourceRecord | undefined>(undefined);
 const logStreams = ref<LogStreamRecord[]>([]);
-const openLogPeekStream = ref<string | undefined>(undefined);
+const closeLogPeekFunction = ref<(() => void) | undefined>(undefined);
+const logPeekStream = ref<string | undefined>(undefined);
 
 onMounted(async () => {
   const id = route.params['id'] as string;
@@ -140,7 +141,7 @@ const getStatus = (id: string | undefined): ConnectionStatus => {
   return 'disconnected';
 };
 
-const deleteDataSource = (ds: DataSource | undefined) => {
+const deleteDataSource = (ds: DataSourceRecord | undefined) => {
   if (!ds) return;
   dialog.create({
     title: 'Confirm deletion',
@@ -171,16 +172,19 @@ const unsubscribe = (id: string) => {
 };
 
 const openLogPeek = (stream: string) => {
-  logStreamStore.subscribe(dataSource.value?.id ?? '', stream);
-  openLogPeekStream.value = stream;
+  logPeekStream.value = stream;
+  closeLogPeekFunction.value = logStreamStore.subscribeTemp(
+    dataSource.value?.id ?? '',
+    stream,
+  );
 };
 
 const closeLogPeek = () => {
-  logStreamStore.unsubscribe(
-    dataSource.value?.id ?? '',
-    openLogPeekStream.value ?? '',
-  );
-  openLogPeekStream.value = undefined;
+  if (closeLogPeekFunction.value) {
+    closeLogPeekFunction.value();
+    logPeekStream.value = undefined;
+    closeLogPeekFunction.value = undefined;
+  }
 };
 
 const refresh = async () => {
