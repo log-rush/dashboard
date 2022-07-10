@@ -144,32 +144,19 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
 
   const init = () => {
     console.log('init streams');
-    //const storedStreams = localStorage.getItem(StorageKeys.Streams);
-    //if (storedStreams) {
-    //  const parsedLogStreams: StoredLogStream[] = JSON.parse(storedStreams);
-    //  for (const ls of parsedLogStreams) {
-    //    logStreams[ls.dataSource][ls.id] = {
-    //      ...ls,
-    //      isSubscribed: false,
-    //      isCached: true,
-    //      status: 'connecting',
-    //    };
-    //    // fetch current state
-    //    LogRushHttpApi.getStream(
-    //      reactiveState.dataSources[ls.dataSource].url, // TODO: wrong dependency direction
-    //      ls.id,
-    //    ).then((stream) => {
-    //      if (stream) {
-    //        logStreams[ls.dataSource][ls.id].status = 'available';
-    //        logStreams[ls.dataSource][ls.id].alias = stream.alias;
-    //        stores.logs.clearLogs(ls.id);
-    //        subscribe(ls.dataSource, ls.id);
-    //      } else {
-    //        logStreams[ls.dataSource][ls.id].status = 'error';
-    //      }
-    //    });
-    //  }
-    //}
+    const storedStreams = localStorage.getItem(StorageKeys.Streams);
+    if (storedStreams) {
+      const parsedLogStreams: StoredLogStream[] = JSON.parse(storedStreams);
+      for (const ls of parsedLogStreams) {
+        LogStream.createFromCache(ls).then((logStream) => {
+          if (logStream) {
+            logStreams[ls.dataSource][ls.id] = logStream;
+            stores.logs.clearLogs(logStream.id);
+            saveState();
+          }
+        });
+      }
+    }
   };
 
   const Store = {
