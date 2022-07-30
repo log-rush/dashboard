@@ -6,7 +6,6 @@ export interface LogStreamRecord {
   dataSource: string;
   status: ConnectionStatus;
   isSubscribed: boolean;
-  isCached: boolean;
 }
 
 export interface StoredLogStream {

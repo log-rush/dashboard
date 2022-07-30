@@ -7,5 +7,4 @@ export type LogStreamsStore = {
   unsubscribe: (ofDataSourceId: string, stream: string) => void;
   getSubscribedStreams: () => LogStreamRecord[];
   getSubscribedStreamsForDataSource: (dsId: string) => LogStreamRecord[];
-  getCachedStreamsForDataSource: (dsId: string) => LogStreamRecord[];
 };

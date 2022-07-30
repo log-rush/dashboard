@@ -8,15 +8,10 @@ export class LogStream
   implements RecordAble<LogStreamRecord>, StorageRecordAble<StoredLogStream>
 {
   private _isSubscribed = false;
-  private _isCached = false;
   private _connectionStatus: ConnectionStatus = 'disconnected';
 
   get isSubscribed(): boolean {
     return this._isSubscribed;
-  }
-
-  get isCached(): boolean {
-    return this._isCached;
   }
 
   get status(): ConnectionStatus {
@@ -46,15 +41,14 @@ export class LogStream
     return undefined;
   }
 
-  public static async createFromCache(
-    data: StoredLogStream,
-  ): Promise<LogStream | undefined> {
-    const stream = new LogStream(data.id, data.alias, undefined);
-    stream._isCached = true;
-    stream._connectionStatus = 'disconnected';
-    // TODO: restore cached
-    return stream;
-  }
+  // public static async createFromCache(
+  //   data: StoredLogStream,
+  // ): Promise<LogStream | undefined> {
+  //   const stream = new LogStream(data.id, data.alias, undefined);
+  //   stream._connectionStatus = 'disconnected';
+  //   // TODO: restore cached
+  //   return stream;
+  // }
 
   public subscribe() {
     if (!this._isSubscribed && this._dataSource) {
@@ -101,7 +95,6 @@ export class LogStream
       id: this.id,
       alias: this.alias,
       dataSource: this.dataSource,
-      isCached: this._isCached,
       isSubscribed: this._isSubscribed,
       status: this.status,
     };
