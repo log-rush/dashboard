@@ -31,7 +31,6 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
     // TODO: set state to loading temp? (or only cached ones)
     const allStreams: LogStreamRecord[] = [];
     const streams = await ds.listStreams();
-    console.log(streams);
     for (const stream of streams) {
       if (stream.id in logStreams[dsId]) {
         // stream already existing
@@ -49,7 +48,6 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
       } else {
         // new stream
         const newStream = await LogStream.create(ds, stream.id);
-        console.log(newStream);
         if (newStream) {
           allStreams.push(newStream);
           logStreams[dsId][stream.id] = newStream;
@@ -57,7 +55,6 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
         }
       }
     }
-    console.log(allStreams);
     return allStreams;
 
     //for (const key of Object.keys(logStreams[dsId])) {
@@ -143,7 +140,6 @@ const createStore: CreateStoreFunc<'logStreams', StorageKeys.Streams> = ({
   };
 
   const init = () => {
-    console.log('init streams');
     const storedStreams = localStorage.getItem(StorageKeys.Streams);
     if (storedStreams) {
       const parsedLogStreams: StoredLogStream[] = JSON.parse(storedStreams);

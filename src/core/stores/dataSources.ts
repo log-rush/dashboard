@@ -79,8 +79,6 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
   };
 
   const init = () => {
-    console.log('init data sources');
-
     const storedSources = localStorage.getItem(StorageKeys.DataSources);
     if (!storedSources) return;
 

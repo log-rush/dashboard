@@ -68,8 +68,6 @@ export class DataSource
   static async createFromCache(data: StoredDataSource): Promise<DataSource> {
     const ds = new DataSource(data.id, data.url, data.name, data.version);
     ds._connectionStatus = 'disconnected';
-
-    console.log('test', data);
     const newData = await Injector.get(
       InjectionKey.DataSourcesService,
     ).getDataSource(data.url);

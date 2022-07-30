@@ -65,7 +65,6 @@ const createStore: CreateStoreFunc<'allLogs', StorageKeys.NonPersistent> = ({
   };
 
   const getLogs = () => {
-    console.log('collecting logs');
     return stores.logStreams
       .getSubscribedStreams()
       .flatMap((stream) =>

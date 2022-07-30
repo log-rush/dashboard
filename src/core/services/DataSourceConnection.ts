@@ -83,11 +83,8 @@ export class DataSourceConnection {
 
   private handleMessage(evt: MessageEvent) {
     const message = LRPCoder.decode(evt.data);
-    console.log(message);
-
     if (!message) return;
     if (message.operation === LRPOperation.OprStillAlive) {
-      console.log('alive test');
       this.connection.send(
         LRPCoder.encode({ operation: LRPOperation.OprAlive, payload: '' }),
       );
@@ -109,7 +106,6 @@ export class DataSourceConnection {
   private handleOpen() {
     this.retryAttempts = this.maxRetryAttempts;
     if (this._queue.length > 0) {
-      console.log('sending saved queue');
       const tmp = [...this._queue];
       this._queue = [];
       for (const msg of tmp) {
@@ -137,7 +133,6 @@ export class DataSourceConnection {
     ) {
       return;
     }
-    console.log('reconnecting');
     this.retryAttempts--;
     this.isReconnecting = true;
     if (this.connection.state === WebSocket.OPEN) {

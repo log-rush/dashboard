@@ -61,7 +61,6 @@ const appendLog = (data: string) => {
   const formatted = formatter.format(data);
   if (wrapper.value) {
     wrapper.value.innerHTML += formatted;
-    console.log(configStore.getConfig(ConfigKey.ScrollToBottom));
     if (configStore.getConfig(ConfigKey.ScrollToBottom)) {
       wrapper.value.scrollTop = wrapper.value.scrollHeight;
     }

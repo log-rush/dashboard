@@ -12,27 +12,23 @@ export class Socket {
   public onOpen(handler: (evt: Event) => void) {
     this._connection.onopen = (evt) => {
       handler(evt);
-      console.log('open');
     };
   }
 
   public onError(handler: (evt: Event) => void) {
     this._connection.onerror = (evt) => {
       handler(evt);
-      console.log('error');
     };
   }
 
   public onClose(handler: (evt: CloseEvent) => void) {
     this._connection.onclose = (evt) => {
       handler(evt);
-      console.log('close');
     };
   }
 
   public onMessage(handler: (evt: MessageEvent) => void) {
     this._connection.onmessage = (evt) => {
-      console.log('message');
       handler(evt);
     };
   }

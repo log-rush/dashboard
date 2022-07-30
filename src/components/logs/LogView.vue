@@ -24,7 +24,6 @@ const formatter = new LogFormatter({
 
 onMounted(() => {
   const storedLogs = logStore.getLogs(props.stream);
-  console.log(storedLogs);
   for (const log of storedLogs) {
     appendLog(log.message);
   }
