@@ -23,7 +23,10 @@
     <template #extra>
       <slot name="extra"></slot>
     </template>
-    <template #footer> Copyright </template>
+    <template #footer>
+      log-rush © Fabian Kachlock {{ new Date().getFullYear() }} - All rights
+      reserved.
+    </template>
   </n-page-header>
 </template>
 

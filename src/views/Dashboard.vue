@@ -25,13 +25,16 @@
           :value="selectedValue"
           :expand-icon="CreateIconRenderer('mdi:chevron-down')"
         />
-        <n-menu
+        <!--
+          TODO: add back when implemented
+          <n-menu
           :collapsed="collapsed"
           :render-label="renderMenuLabel"
           :options="ViewsMenu"
           :value="selectedValue"
           :expand-icon="CreateIconRenderer('mdi:chevron-down')"
         />
+        -->
         <n-menu
           :collapsed="collapsed"
           :render-label="renderMenuLabel"
@@ -40,13 +43,15 @@
           :expand-icon="CreateIconRenderer('mdi:chevron-down')"
         />
         <div class="menu-spacer"></div>
-        <n-menu
+        <!--
+          <n-menu
           :collapsed="collapsed"
           :render-label="renderMenuLabel"
           :options="BottomMenu"
           :value="selectedValue"
           :expand-icon="CreateIconRenderer('mdi:chevron-down')"
         />
+        -->
       </div>
     </n-layout-sider>
     <div style="position: relative; padding: 24px; width: 100%">

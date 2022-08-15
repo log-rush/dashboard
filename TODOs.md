@@ -1,1 +1,5 @@
 - Notify user when data source already exists
+- Fix unknown dataSource on initial dataSource detail page
+- Interactive show names on all logs
+- auto connect data sources options (saved on data source)
+- **accept links containing a ds (without being registered on this instance)**
