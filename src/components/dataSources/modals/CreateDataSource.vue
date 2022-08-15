@@ -17,6 +17,8 @@
           <n-input
             v-model:value="formValue.url"
             placeholder="Service Url"
+            @keyup.prevent.enter="createDataSource"
+            @keyup.prevent.esc="emit('close')"
             clearable
           />
         </n-form-item>
@@ -58,6 +60,8 @@ import {
   FormItemRule,
   FormValidationError,
   NAlert,
+  useNotification,
+  useMessage,
 } from 'naive-ui';
 import { defineProps, defineEmits, ref, watch, computed } from 'vue';
 
@@ -74,6 +78,7 @@ const FullRegex =
 const NearRegex =
   /^http(s?):\/\/(localhost|(\d{1,3}\.){3}\d{1,3}|(.*\.)?(.*)\.(.*))(:\d{1,5})?$/;
 
+const message = useMessage();
 const dataSources = useDataSources();
 const formRef = ref<FormInst | null>(null);
 const createDisabled = ref(false);
@@ -133,6 +138,7 @@ const createDataSource = (e: MouseEvent) => {
         const success = await dataSources.createDataSource(formValue.value.url);
         if (success) {
           emit('close');
+          message.success(`Created DataSource ${formValue.value.url}`);
           formValue.value = { url: '' };
         } else {
           cantFindDataSource.value = true;
