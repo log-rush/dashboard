@@ -7,7 +7,13 @@
       size="huge"
       role="dialog"
     >
-      <n-form :model="formValue" :rules="rules" size="medium" ref="formRef">
+      <n-form
+        :model="formValue"
+        :rules="rules"
+        size="medium"
+        ref="formRef"
+        @keyup.prevent.esc="emit('close')"
+      >
         <n-form-item
           label="Url"
           path="url"
@@ -18,7 +24,6 @@
             v-model:value="formValue.url"
             placeholder="Service Url"
             @keyup.prevent.enter="createDataSource"
-            @keyup.prevent.esc="emit('close')"
             clearable
           />
         </n-form-item>
@@ -60,7 +65,6 @@ import {
   FormItemRule,
   FormValidationError,
   NAlert,
-  useNotification,
   useMessage,
 } from 'naive-ui';
 import { defineProps, defineEmits, ref, watch, computed } from 'vue';
