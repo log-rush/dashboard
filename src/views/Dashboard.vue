@@ -67,6 +67,7 @@ import { computed, h, onMounted, ref, VNode, watch } from 'vue';
 import { IconRenderer, CreateIconRenderer } from '@/components/Icon';
 import { RouterLink, useRoute } from 'vue-router';
 import { useDataSources } from '@/core/stores/root';
+import { InjectionKey, Injector } from '@/core/Injector';
 
 const route = useRoute();
 const dataSourcesStore = useDataSources();
@@ -80,6 +81,7 @@ watch(
 
 onMounted(() => {
   setMenuSelectionByPath(route.path);
+  Injector.get(InjectionKey.ActionQueryService).handleQuery(route.query);
 });
 
 const setMenuSelectionByPath = (path: string) => {

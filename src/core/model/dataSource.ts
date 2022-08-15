@@ -13,6 +13,10 @@ export interface StoredDataSource {
   version: string;
 }
 
+export type DataSourceLink = {
+  url: string;
+};
+
 export type ConnectionStatus =
   | 'disconnected'
   | 'available'
