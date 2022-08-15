@@ -74,17 +74,24 @@
           <template v-if="dataSource">
             <n-button
               v-if="getStatus(dataSource?.id) === 'disconnected'"
-              ghost
+              secondary
               @click="reconnect()"
               >Reconnect</n-button
             >
             <n-button
-              v-if="dataSource.status === 'available'"
+              v-if="getStatus(dataSource?.id) === 'available'"
+              secondary
+              type="success"
               @click="connect(dataSource?.id ?? '')"
               >Connect</n-button
             >
-            <n-button ghost @click="refresh()">Refresh</n-button>
-            <n-button type="error" ghost @click="deleteDataSource(dataSource)"
+            <n-button secondary type="tertiary" @click="refresh()"
+              >Refresh</n-button
+            >
+            <n-button
+              secondary
+              type="error"
+              @click="deleteDataSource(dataSource)"
               >Delete</n-button
             >
           </template>

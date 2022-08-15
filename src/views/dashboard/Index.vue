@@ -30,7 +30,7 @@
       <n-space vertical>
         <n-h2>Actions</n-h2>
         <n-space size="small">
-          <n-button ghost type="primary" @click="createModelOpen = true">
+          <n-button secondary type="primary" @click="createModelOpen = true">
             Add a new DataSource
           </n-button>
         </n-space>
@@ -42,7 +42,7 @@
     </n-space>
     <template #extra>
       <n-space>
-        <n-button ghost>Refresh</n-button>
+        <n-button secondary type="tertiary">Refresh</n-button>
       </n-space>
     </template>
   </page-layout>

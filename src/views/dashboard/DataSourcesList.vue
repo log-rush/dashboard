@@ -23,17 +23,20 @@
                 <Status :status="getStatus(dataSource.id)" />
                 <n-button
                   v-if="dataSource.status === 'available'"
+                  secondary
+                  type="success"
                   @click="connect(dataSource.id)"
                   >Connect</n-button
                 >
                 <n-button
                   v-if="dataSource.status === 'connected'"
+                  secondary
                   @click="handleShow(dataSource.id)"
                   >Show</n-button
                 >
                 <n-button
+                  secondary
                   type="error"
-                  ghost
                   @click="deleteDataSource(dataSource.id, dataSource.name)"
                   >Delete</n-button
                 >
@@ -60,8 +63,9 @@
 
     <template #extra>
       <n-space>
-        <n-button ghost @click="createModelOpen = true">Add New</n-button>
-        <n-button ghost>Refresh</n-button>
+        <n-button tertiary type="success" @click="createModelOpen = true"
+          >Add New</n-button
+        >
       </n-space>
     </template>
   </page-layout>
