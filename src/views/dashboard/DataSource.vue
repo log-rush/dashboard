@@ -4,12 +4,12 @@
       <n-space vertical size="large">
         <n-space :size="30">
           <n-space vertical :size="0">
-            <n-p> URL </n-p>
-            <n-h6>{{ dataSource.url }}</n-h6>
-          </n-space>
-          <n-space vertical :size="0">
             <n-p> ID </n-p>
             <n-h6>{{ dataSource.id }}</n-h6>
+          </n-space>
+          <n-space vertical :size="0">
+            <n-p> URL </n-p>
+            <n-h6>{{ dataSource.url }}</n-h6>
           </n-space>
           <n-space vertical :size="0">
             <n-p> VERSION </n-p>

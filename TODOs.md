@@ -3,3 +3,4 @@
 - Interactive show names on all logs
 - auto connect data sources options (saved on data source)
 - **accept links containing a ds (without being registered on this instance)**
+- modal in all logs section for toggling stream subscriptions
