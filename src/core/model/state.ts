@@ -2,7 +2,7 @@ import { UnwrapNestedRefs } from 'vue';
 import { DataSource } from '../domain/DataSource';
 import { LogStream } from '../domain/LogStream';
 import { Config } from './config';
-import { LogHistory } from './Log';
+import { LogHistory } from './log';
 
 export type ReactiveState = {
   dataSources: Record<string, UnwrapNestedRefs<DataSource>>;
