@@ -28,10 +28,7 @@
                   @click="connect(dataSource.id)"
                   >Connect</n-button
                 >
-                <n-button
-                  v-if="dataSource.status === 'connected'"
-                  secondary
-                  @click="handleShow(dataSource.id)"
+                <n-button secondary @click="handleShow(dataSource.id)"
                   >Show</n-button
                 >
                 <n-button
