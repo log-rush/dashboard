@@ -1,5 +1,4 @@
 - Notify user when data source already exists --> where do i handle these errors
 - Fix unknown dataSource on initial dataSource detail page
-- Interactive show names on all logs
 - auto connect data sources options (saved on data source)
 - modal in all logs section for toggling stream subscriptions

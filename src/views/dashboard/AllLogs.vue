@@ -47,14 +47,20 @@ watch(
 );
 
 onMounted(() => {
-  const storedLogs = allLogsStore.getLogs();
-  for (const log of storedLogs) {
-    appendLog(log.message);
-  }
+  showStoredLogs();
 });
 
 const updateShowNames = (enabled: boolean) => {
   allLogsStore.setShowNames(enabled);
+  resetLogs();
+  showStoredLogs();
+};
+
+const showStoredLogs = () => {
+  const storedLogs = allLogsStore.getLogs();
+  for (const log of storedLogs) {
+    appendLog(log.message);
+  }
 };
 
 const appendLog = (data: string) => {
@@ -64,6 +70,12 @@ const appendLog = (data: string) => {
     if (configStore.getConfig(ConfigKey.ScrollToBottom)) {
       wrapper.value.scrollTop = wrapper.value.scrollHeight;
     }
+  }
+};
+
+const resetLogs = () => {
+  if (wrapper.value) {
+    wrapper.value.innerHTML = '';
   }
 };
 </script>
