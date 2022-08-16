@@ -1,4 +1,5 @@
-- Notify user when data source already exists --> where do i handle these errors
-- Fix unknown dataSource on initial dataSource detail page
+- Notify user when data source already exists --> where do i handle these errors (error system)
+- Fix unknown dataSource on initial dataSource detail page (sync init ds)
 - modal in all logs section for toggling stream subscriptions
 - Dashboard status not reactive
+- use pinia for simplicity (or fix reactivity issues)

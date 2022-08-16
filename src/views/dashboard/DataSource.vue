@@ -38,7 +38,7 @@
               <template #suffix>
                 <n-space justify="end" align="center" :wrap="false">
                   <Status :status="stream.status" />
-                  <template v-if="dataSource.status === 'connected'">
+                  <template v-if="getStatus(dataSource?.id) === 'connected'">
                     <n-button @click="openLogPeek(stream.id)"
                       >Show Logs</n-button
                     >
