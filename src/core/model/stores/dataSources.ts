@@ -7,6 +7,7 @@ export type DataSourcesStore = {
   createDataSource: (url: string) => Promise<boolean>;
   deleteDataSource: (id: string) => void;
   reconnect: (id: string) => void;
+  setAutoConnect: (id: string, enabled: boolean) => void;
   getDataSource: (id: string | undefined) => DataSourceRecord | undefined;
   getRawDataSource: (
     id: string | undefined,

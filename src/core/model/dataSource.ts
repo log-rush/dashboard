@@ -3,6 +3,7 @@ export interface DataSourceRecord {
   url: string;
   name: string;
   version: string;
+  autoConnect: boolean;
   status: ConnectionStatus;
 }
 
@@ -11,6 +12,7 @@ export interface StoredDataSource {
   url: string;
   name: string;
   version: string;
+  autoConnect: boolean;
 }
 
 export type DataSourceLink = {

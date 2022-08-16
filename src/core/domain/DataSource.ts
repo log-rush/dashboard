@@ -40,11 +40,16 @@ export class DataSource
     return this._connectionStatus;
   }
 
+  public get autoConnect(): boolean {
+    return this._autoConnect;
+  }
+
   private constructor(
     private _id: string,
     private _url: string,
     private _name: string,
     private _version: string,
+    private _autoConnect: boolean,
   ) {
     this._updateHandler = {
       onLog() {
@@ -58,15 +63,25 @@ export class DataSource
       InjectionKey.DataSourcesService,
     ).getDataSource(url);
     if (data) {
-      const ds = new DataSource(data.id, url, data.name, data.version);
+      const ds = new DataSource(data.id, url, data.name, data.version, false);
       ds._connectionStatus = 'available';
       return ds;
     }
     return undefined;
   }
 
-  static async createFromCache(data: StoredDataSource): Promise<DataSource> {
-    const ds = new DataSource(data.id, data.url, data.name, data.version);
+  static async createFromCache(
+    data: StoredDataSource,
+    handler: DataSourceUpdateHandler,
+  ): Promise<DataSource> {
+    console.log(data);
+    const ds = new DataSource(
+      data.id,
+      data.url,
+      data.name,
+      data.version,
+      data.autoConnect,
+    );
     ds._connectionStatus = 'disconnected';
     const newData = await Injector.get(
       InjectionKey.DataSourcesService,
@@ -76,6 +91,9 @@ export class DataSource
       ds._name = newData.name;
       ds._version = newData.version;
       ds._connectionStatus = 'available';
+    }
+    if (ds.autoConnect) {
+      ds.connect(handler);
     }
     return ds;
   }
@@ -132,6 +150,10 @@ export class DataSource
     }
   }
 
+  public setAutoConnect(enabled: boolean) {
+    this._autoConnect = enabled;
+  }
+
   toRecord(): DataSourceRecord {
     return {
       id: this.id,
@@ -139,6 +161,7 @@ export class DataSource
       status: this.status,
       url: this.url,
       version: this.version,
+      autoConnect: this.autoConnect,
     };
   }
 
@@ -148,6 +171,7 @@ export class DataSource
       name: this.name,
       url: this.url,
       version: this.version,
+      autoConnect: this.autoConnect,
     };
   }
 }

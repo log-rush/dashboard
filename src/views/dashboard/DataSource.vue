@@ -15,6 +15,13 @@
             <n-p> VERSION </n-p>
             <n-h6>{{ dataSource.version }}</n-h6>
           </n-space>
+          <n-space vertical :size="0">
+            <n-p> AUTO_CONNECT </n-p>
+            <n-switch
+              :value="dataSource.autoConnect"
+              @update:value="toggleAutoConnect"
+            ></n-switch>
+          </n-space>
         </n-space>
         <n-h2>LogStreams</n-h2>
         <n-space vertical>
@@ -112,6 +119,7 @@ import {
   NH2,
   NH6,
   NP,
+  NSwitch,
   useDialog,
 } from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
@@ -164,6 +172,13 @@ const deleteDataSource = (ds: DataSourceRecord | undefined) => {
       router.push('/data-sources');
     },
   });
+};
+
+const toggleAutoConnect = (enabled: boolean) => {
+  if (dataSource.value) {
+    dataSourcesStore.setAutoConnect(dataSource.value.id, enabled);
+    dataSource.value.autoConnect = enabled;
+  }
 };
 
 const connect = (id: string) => {

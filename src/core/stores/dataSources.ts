@@ -53,29 +53,20 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
     getRawDataSource(id)?.connect({
       onLog: logHandler,
     });
-    // TODO: handle cached subscriptions
-
-    // if (!connections[id] && getDataSource(id)) {
-    //   connections[id] = createConnection(id, getDataSource(id)?.url ?? '');
-    // } else {
-    //   connections[id]?.tryReConnect();
-    // }
   };
 
   const reconnect = (id: string) => {
     getRawDataSource(id)?.reconnect();
   };
 
-  //  stores.logStreams.getCachedStreamsForDataSource(id).forEach((stream) => {
-  //    connection.subscribe(stream.id);
-  //    stores.logs.clearLogs(stream.id);
-  //    stream.isSubscribed = true;
-  //    stream.status = 'connected';
-  //  });
-
   const logHandler = (stream: string, log: LogRecord) => {
     reactiveState.logs[stream].logs.push(log);
     reactiveState.logs[stream].lastLog = log;
+  };
+
+  const setAutoConnect = (id: string, enabled: boolean) => {
+    getRawDataSource(id)?.setAutoConnect(enabled);
+    saveState();
   };
 
   const init = () => {
@@ -84,7 +75,9 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
 
     const parsedDataSources = JSON.parse(storedSources) as StoredDataSource[];
     for (const _cachedDs of parsedDataSources) {
-      DataSource.createFromCache(_cachedDs).then((ds) => {
+      DataSource.createFromCache(_cachedDs, {
+        onLog: logHandler,
+      }).then((ds) => {
         dataSources[ds.id] = ds;
         logStreams[ds.id] = logStreams[ds.id] ?? {}; // TODO: handle this in logStreams store
         saveState();
@@ -100,6 +93,7 @@ const createStore: CreateStoreFunc<'dataSources', StorageKeys.DataSources> = ({
     getDataSource,
     getRawDataSource,
     reconnect,
+    setAutoConnect,
   };
 
   return {
