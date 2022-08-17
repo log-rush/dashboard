@@ -13,6 +13,7 @@
     "@log-rush/log-formatter": "^1.1.0",
     "core-js": "^3.6.5",
     "naive-ui": "^2.28.0",
+    "pinia": "^2.0.18",
     "vue": "^3.0.0",
     "vue-i18n": "9",
     "vue-router": "^4.0.0-0"

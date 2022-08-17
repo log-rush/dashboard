@@ -3,3 +3,4 @@
 - modal in all logs section for toggling stream subscriptions
 - Dashboard status not reactive
 - use pinia for simplicity (or fix reactivity issues)
+- allow same log stream id across multiple data sources
