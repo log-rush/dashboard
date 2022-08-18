@@ -144,7 +144,7 @@ import {
   useDialog,
 } from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { DataSourceRecord } from '@/core/model/dataSource';
 import Status from '@/components/util/Status.vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -165,11 +165,12 @@ const logStreams = ref<LogStreamRecord[]>([]);
 const closeLogPeekFunction = ref<(() => void) | undefined>(undefined);
 const logPeekStream = ref<string | undefined>(undefined);
 
-onMounted(async () => {
-  const id = route.params['id'] as string;
-  if (id) {
-    logStreams.value = await logStreamStore.getStreamsForDataSource(id);
-  }
+onMounted(() => {
+  refresh();
+});
+
+watch(dataSource, () => {
+  refresh();
 });
 
 const deleteDataSource = (ds: DataSourceRecord | undefined) => {
@@ -199,6 +200,7 @@ const toggleAutoConnect = (enabled: boolean) => {
 
 const connect = (id: string) => {
   dataSourcesStore.connect(id);
+  refresh();
 };
 
 const disconnect = (id: string) => {
