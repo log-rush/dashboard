@@ -10,8 +10,11 @@ export const useLogs = defineStore('log-rush-logs', {
     getLastLog: (state) => (stream: string) => state._logs[stream].lastLog,
   },
   actions: {
-    _prepareLogs(streamId: string) {
-      this._logs[streamId] = {
+    _createKey(dsId: string, streamId: string) {
+      return `${dsId}$${streamId}`;
+    },
+    _prepareLogs(dsId: string, streamId: string) {
+      this._logs[this._createKey(dsId, streamId)] = {
         lastLog: {
           message: '',
           timestamp: 0,
@@ -19,19 +22,19 @@ export const useLogs = defineStore('log-rush-logs', {
         logs: [],
       };
     },
-    _createLogHandler() {
-      return (stream: string, log: LogRecord) => {
-        if (this._logs[stream]) {
-          const lastLog = this._logs[stream].lastLog;
+    _createLogHandler(dsId: string) {
+      return (streamId: string, log: LogRecord) => {
+        if (this._logs[this._createKey(dsId, streamId)]) {
+          const lastLog = this._logs[this._createKey(dsId, streamId)].lastLog;
           if (lastLog) {
-            this._logs[stream].logs.push(lastLog);
+            this._logs[this._createKey(dsId, streamId)].logs.push(lastLog);
           }
-          this._logs[stream].lastLog = log;
+          this._logs[this._createKey(dsId, streamId)].lastLog = log;
         }
       };
     },
-    clearLogs(streamId: string) {
-      this._logs[streamId] = {
+    clearLogs(dsId: string, streamId: string) {
+      this._logs[this._createKey(dsId, streamId)] = {
         lastLog: {
           message: '',
           timestamp: 0,

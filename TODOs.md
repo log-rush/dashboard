@@ -1,3 +1,2 @@
 - Notify user when data source already exists --> where do i handle these errors (error system)
 - modal in all logs section for toggling stream subscription
-- allow same log stream id across multiple data sources

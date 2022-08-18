@@ -44,7 +44,7 @@ export const useLogStreams = defineStore('log-rush-logStreams', {
           if (newStream) {
             allStreams.push(newStream);
             this._logStreams[dsId][stream.id] = newStream;
-            useLogs()._prepareLogs(stream.id);
+            useLogs()._prepareLogs(ds.id, stream.id);
           }
         }
       }
@@ -57,7 +57,7 @@ export const useLogStreams = defineStore('log-rush-logStreams', {
       const close = this.getRawStream(dsId, id)?.subscribeTemporary();
       return () => {
         if (close()) {
-          useLogs().clearLogs(id);
+          useLogs().clearLogs(dsId, id);
         }
       };
     },
