@@ -11,6 +11,7 @@ export class DataSourceConnection {
   private retryAttempts = 3;
   private isReconnecting = false;
   private shouldReconnect = true;
+  private suppressCloseStatusUpdate = false;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private logHandler: (stream: string, log: LogRecord) => void = () => {};
@@ -27,7 +28,9 @@ export class DataSourceConnection {
   public close() {
     if (this.connection.state === WebSocket.OPEN) {
       this.shouldReconnect = false;
+      this.suppressCloseStatusUpdate = true;
       this.connection.close();
+      this.statusUpdateHandler('available');
     }
   }
 
@@ -121,7 +124,11 @@ export class DataSourceConnection {
   }
 
   private handleClose() {
-    this.statusUpdateHandler('disconnected');
+    if (!this.suppressCloseStatusUpdate) {
+      this.statusUpdateHandler('disconnected');
+    } else {
+      this.suppressCloseStatusUpdate = false;
+    }
     this.reconnect();
   }
 
