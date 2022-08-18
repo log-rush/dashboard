@@ -38,7 +38,7 @@
               <template #suffix>
                 <n-space justify="end" align="center" :wrap="false">
                   <Status :status="stream.status" />
-                  <template v-if="getStatus(dataSource?.id) === 'connected'">
+                  <template v-if="dataSource?.status === 'connected'">
                     <n-button @click="openLogPeek(stream.id)"
                       >Show Logs</n-button
                     >
@@ -77,25 +77,40 @@
     <template #extra>
       <n-space>
         <n-space justify="end" align="center" :wrap="false">
-          <Status :status="getStatus(dataSource?.id)" />
+          <Status :status="dataSource?.status ?? 'warn'" />
           <template v-if="dataSource">
             <n-button
-              v-if="getStatus(dataSource?.id) === 'disconnected'"
+              v-if="dataSource.status === 'disconnected'"
+              key="reconnectButton"
               secondary
               @click="reconnect()"
               >Reconnect</n-button
             >
             <n-button
-              v-if="getStatus(dataSource?.id) === 'available'"
+              v-if="dataSource.status === 'available'"
+              key="connectButton"
               secondary
               type="success"
               @click="connect(dataSource?.id ?? '')"
               >Connect</n-button
             >
-            <n-button secondary type="tertiary" @click="refresh()"
+            <n-button
+              v-if="dataSource.status === 'connected'"
+              key="disconnectButton"
+              secondary
+              type="tertiary"
+              @click="disconnect(dataSource?.id ?? '')"
+              >Disconnect</n-button
+            >
+            <n-button
+              key="refreshButton"
+              secondary
+              type="tertiary"
+              @click="refresh()"
               >Refresh</n-button
             >
             <n-button
+              key="deleteButton"
               secondary
               type="error"
               @click="deleteDataSource(dataSource)"
@@ -123,8 +138,8 @@ import {
   useDialog,
 } from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
-import { onMounted, ref } from 'vue';
-import { ConnectionStatus, DataSourceRecord } from '@/core/model/dataSource';
+import { computed, onMounted, ref } from 'vue';
+import { DataSourceRecord } from '@/core/model/dataSource';
 import Status from '@/components/util/Status.vue';
 import { useRoute, useRouter } from 'vue-router';
 import LogPeekModal from '@/components/streams/modals/LogPeekModal.vue';
@@ -137,7 +152,9 @@ const logStreamStore = useLogStreams();
 const dialog = useDialog();
 const route = useRoute();
 const router = useRouter();
-const dataSource = ref<DataSourceRecord | undefined>(undefined);
+const dataSource = computed<DataSourceRecord | undefined>(() =>
+  dataSourcesStore.getDataSource(route.params['id'] as string),
+);
 const logStreams = ref<LogStreamRecord[]>([]);
 const closeLogPeekFunction = ref<(() => void) | undefined>(undefined);
 const logPeekStream = ref<string | undefined>(undefined);
@@ -145,17 +162,9 @@ const logPeekStream = ref<string | undefined>(undefined);
 onMounted(async () => {
   const id = route.params['id'] as string;
   if (id) {
-    dataSource.value = dataSourcesStore.getDataSource(id);
     logStreams.value = await logStreamStore.getStreamsForDataSource(id);
   }
 });
-
-const getStatus = (id: string | undefined): ConnectionStatus => {
-  if (id) {
-    return dataSourcesStore.getDataSource(id)?.status ?? 'warn';
-  }
-  return 'disconnected';
-};
 
 const deleteDataSource = (ds: DataSourceRecord | undefined) => {
   if (!ds) return;
@@ -184,6 +193,10 @@ const toggleAutoConnect = (enabled: boolean) => {
 
 const connect = (id: string) => {
   dataSourcesStore.connect(id);
+};
+
+const disconnect = (id: string) => {
+  dataSourcesStore.disconnect(id);
 };
 
 const subscribe = (id: string) => {

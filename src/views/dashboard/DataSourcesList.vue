@@ -20,18 +20,31 @@
             </n-thing>
             <template #suffix>
               <n-space justify="end" align="center" :wrap="false">
-                <Status :status="getStatus(dataSource.id)" />
+                <Status :status="dataSource.status" />
                 <n-button
                   v-if="dataSource.status === 'available'"
+                  key="connectButton"
                   secondary
                   type="success"
                   @click="connect(dataSource.id)"
                   >Connect</n-button
                 >
-                <n-button secondary @click="handleShow(dataSource.id)"
+                <n-button
+                  v-if="dataSource.status === 'connected'"
+                  key="disconnectButton"
+                  secondary
+                  type="tertiary"
+                  @click="disconnect(dataSource.id)"
+                  >Disconnect</n-button
+                >
+                <n-button
+                  secondary
+                  key="showButton"
+                  @click="handleShow(dataSource.id)"
                   >Show</n-button
                 >
                 <n-button
+                  key="deleteButton"
                   secondary
                   type="error"
                   @click="deleteDataSource(dataSource.id, dataSource.name)"
@@ -93,9 +106,6 @@ const router = useRouter();
 const allDataSources = computed(() => dataSourcesStore.allDataSources);
 const createModelOpen = ref(false);
 
-const getStatus = (id: string) =>
-  dataSourcesStore.getDataSource(id)?.status ?? 'warn';
-
 const deleteDataSource = (id: string, name: string) => {
   dialog.create({
     title: 'Confirm deletion',
@@ -114,6 +124,10 @@ const deleteDataSource = (id: string, name: string) => {
 
 const connect = (id: string) => {
   dataSourcesStore.connect(id);
+};
+
+const disconnect = (id: string) => {
+  dataSourcesStore.disconnect(id);
 };
 
 const handleShow = (id: string) => {
