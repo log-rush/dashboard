@@ -1,9 +1,8 @@
-import { ActionQueryService } from '../model/services/actionQueryService';
 import { LocationQuery } from 'vue-router';
+import { useDataSources } from '../adapter/dataSources';
 import { DataSourceLink } from '../model/dataSource';
-import { useDataSources } from '../stores/root';
 
-export const LinkedDSActionQueryService: ActionQueryService = {
+export const LinkedDSActionQueryService = {
   handleQuery(query: LocationQuery): void {
     const linked = query['linked'];
     try {

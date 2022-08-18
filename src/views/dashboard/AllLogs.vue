@@ -23,9 +23,10 @@ import PageLayout from '@/components/util/PageLayout.vue';
 import { NSpace, NSwitch, NP } from 'naive-ui';
 import { onMounted, ref, watch } from 'vue';
 import { LogFormat, LogFormatter, Optimization } from '@log-rush/log-formatter';
-import { useAllLogs, useConfig } from '@/core/stores/root';
 import { computed } from '@vue/reactivity';
 import { ConfigKey } from '@/core/model/config';
+import { useAllLogs } from '@/core/adapter/usecases/allLogs';
+import { useConfig } from '@/core/adapter/config';
 
 const allLogsStore = useAllLogs();
 const configStore = useConfig();

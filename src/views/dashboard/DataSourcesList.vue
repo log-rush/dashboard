@@ -85,12 +85,12 @@ import CreateDataSource from '@/components/dataSources/modals/CreateDataSource.v
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Status from '@/components/util/Status.vue';
-import { useDataSources } from '@/core/stores/root';
+import { useDataSources } from '@/core/adapter/dataSources';
 
 const dataSourcesStore = useDataSources();
 const dialog = useDialog();
 const router = useRouter();
-const allDataSources = computed(() => dataSourcesStore.allDataSources());
+const allDataSources = computed(() => dataSourcesStore.allDataSources);
 const createModelOpen = ref(false);
 
 const getStatus = (id: string) =>
@@ -113,7 +113,7 @@ const deleteDataSource = (id: string, name: string) => {
 };
 
 const connect = (id: string) => {
-  dataSourcesStore.connectToDataSource(id);
+  dataSourcesStore.connect(id);
 };
 
 const handleShow = (id: string) => {

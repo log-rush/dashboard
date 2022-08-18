@@ -17,6 +17,9 @@ import {
   NDialogProvider,
   NMessageProvider,
 } from 'naive-ui';
+import { useDataSources } from './core/adapter/dataSources';
+
+useDataSources()._init();
 </script>
 
 <style>

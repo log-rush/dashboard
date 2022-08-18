@@ -6,8 +6,9 @@
 import '@log-rush/log-formatter/dist/index.css';
 import { ref, defineProps, onMounted, watch } from 'vue';
 import { LogFormat, LogFormatter, Optimization } from '@log-rush/log-formatter';
-import { useConfig, useLogs } from '@/core/stores/root';
 import { ConfigKey } from '@/core/model/config';
+import { useLogs } from '@/core/adapter/logs';
+import { useConfig } from '@/core/adapter/config';
 
 const props = defineProps<{
   stream: string;

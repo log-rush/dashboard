@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDataSources } from '@/core/stores/root';
+import { useDataSources } from '@/core/adapter/dataSources';
 import {
   NModal,
   NCard,

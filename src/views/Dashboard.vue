@@ -66,8 +66,8 @@ import type { MenuOption } from 'naive-ui';
 import { computed, h, onMounted, ref, VNode, watch } from 'vue';
 import { IconRenderer, CreateIconRenderer } from '@/components/Icon';
 import { RouterLink, useRoute } from 'vue-router';
-import { useDataSources } from '@/core/stores/root';
-import { InjectionKey, Injector } from '@/core/Injector';
+import { useDataSources } from '@/core/adapter/dataSources';
+import { LinkedDSActionQueryService } from '@/core/services/ActionQueryService';
 
 const route = useRoute();
 const dataSourcesStore = useDataSources();
@@ -81,7 +81,7 @@ watch(
 
 onMounted(() => {
   setMenuSelectionByPath(route.path);
-  Injector.get(InjectionKey.ActionQueryService).handleQuery(route.query);
+  LinkedDSActionQueryService.handleQuery(route.query);
 });
 
 const setMenuSelectionByPath = (path: string) => {
@@ -130,7 +130,7 @@ const DataSourceMenu = computed(
         key: 'data-sources',
         icon: () => IconRenderer('mdi:server'),
         href: '/data-sources',
-        children: dataSourcesStore.allDataSources().map((ds) => ({
+        children: dataSourcesStore.allDataSources.map((ds) => ({
           label: ds.name,
           href: `/data-sources/${ds.id}`,
           key: ds.id,

@@ -129,7 +129,8 @@ import Status from '@/components/util/Status.vue';
 import { useRoute, useRouter } from 'vue-router';
 import LogPeekModal from '@/components/streams/modals/LogPeekModal.vue';
 import { LogStreamRecord } from '@/core/model/logStream';
-import { useDataSources, useLogStreams } from '@/core/stores/root';
+import { useDataSources } from '@/core/adapter/dataSources';
+import { useLogStreams } from '@/core/adapter/logStreams';
 
 const dataSourcesStore = useDataSources();
 const logStreamStore = useLogStreams();
@@ -182,7 +183,7 @@ const toggleAutoConnect = (enabled: boolean) => {
 };
 
 const connect = (id: string) => {
-  dataSourcesStore.connectToDataSource(id);
+  dataSourcesStore.connect(id);
 };
 
 const subscribe = (id: string) => {
@@ -195,7 +196,7 @@ const unsubscribe = (id: string) => {
 
 const openLogPeek = (stream: string) => {
   logPeekStream.value = stream;
-  closeLogPeekFunction.value = logStreamStore.subscribeTemp(
+  closeLogPeekFunction.value = logStreamStore.subscribeTemporary(
     dataSource.value?.id ?? '',
     stream,
   );

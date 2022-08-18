@@ -41,15 +41,6 @@ export class LogStream
     return undefined;
   }
 
-  // public static async createFromCache(
-  //   data: StoredLogStream,
-  // ): Promise<LogStream | undefined> {
-  //   const stream = new LogStream(data.id, data.alias, undefined);
-  //   stream._connectionStatus = 'disconnected';
-  //   // TODO: restore cached
-  //   return stream;
-  // }
-
   public subscribe() {
     if (!this._isSubscribed && this._dataSource) {
       this._dataSource.subscribe(this.id);

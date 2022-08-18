@@ -3,6 +3,8 @@
 // import { computed, ref, watch } from 'vue';
 // import { CreateStoreFunc, StorageKeys } from '../util/type';
 
+import { defineStore } from 'pinia';
+
 // const createStore: CreateStoreFunc<'allLogs', StorageKeys.NonPersistent> = ({
 //   stores,
 // }) => {
@@ -98,3 +100,7 @@
 // };
 
 // export default createStore;
+
+export const useAllLogs = defineStore('log-rush--all-logs', {
+  state: () => ({}),
+});

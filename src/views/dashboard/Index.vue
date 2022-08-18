@@ -54,25 +54,33 @@ import Status from '@/components/util/Status.vue';
 import PageLayout from '@/components/util/PageLayout.vue';
 import CreateDataSource from '@/components/dataSources/modals/CreateDataSource.vue';
 import { ref, computed } from 'vue';
-import { useDataSources } from '@/core/stores/root';
+import { useDataSources } from '@/core/adapter/dataSources';
 
 const dataSourcesStore = useDataSources();
 const createModelOpen = ref(false);
-const allDataSources = computed(() => dataSourcesStore.allDataSources());
+const allDataSources = computed(() => dataSourcesStore.allDataSources);
 const connectedCount = computed(
-  () => allDataSources.value.filter((ds) => ds.status === 'connected').length,
+  () =>
+    dataSourcesStore.allDataSources.filter((ds) => ds.status === 'connected')
+      .length,
 );
 const availableCount = computed(
-  () => allDataSources.value.filter((ds) => ds.status === 'available').length,
+  () =>
+    dataSourcesStore.allDataSources.filter((ds) => ds.status === 'available')
+      .length,
 );
 const warnCount = computed(
-  () => allDataSources.value.filter((ds) => ds.status === 'warn').length,
+  () =>
+    dataSourcesStore.allDataSources.filter((ds) => ds.status === 'warn').length,
 );
 const disconnectedCount = computed(
   () =>
-    allDataSources.value.filter((ds) => ds.status === 'disconnected').length,
+    dataSourcesStore.allDataSources.filter((ds) => ds.status === 'disconnected')
+      .length,
 );
 const errorCount = computed(
-  () => allDataSources.value.filter((ds) => ds.status === 'error').length,
+  () =>
+    dataSourcesStore.allDataSources.filter((ds) => ds.status === 'error')
+      .length,
 );
 </script>

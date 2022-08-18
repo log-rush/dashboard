@@ -5,9 +5,10 @@ import {
 } from '@/core/model/dataSource';
 import { DataSourceConnection } from '@/core/services/DataSourceConnection';
 import { LogStreamResponse } from '@/core/model/api/httpTypes';
-import { InjectionKey, Injector } from '@/core/Injector';
 import { LogRecord } from '@/core/model/log';
 import { RecordAble, StorageRecordAble } from '../model/helper';
+import { DataSourcesHttpService } from '../services/DataSourceService';
+import { LogStreamsHttpService } from '../services/LogStreamsService';
 
 interface DataSourceUpdateHandler {
   onLog(stream: string, log: LogRecord): void;
@@ -59,9 +60,7 @@ export class DataSource
   }
 
   static async create(url: string): Promise<DataSource | undefined> {
-    const data = await Injector.get(
-      InjectionKey.DataSourcesService,
-    ).getDataSource(url);
+    const data = await DataSourcesHttpService.getDataSource(url);
     if (data) {
       const ds = new DataSource(data.id, url, data.name, data.version, false);
       ds._connectionStatus = 'available';
@@ -83,9 +82,7 @@ export class DataSource
       data.autoConnect,
     );
     ds._connectionStatus = 'disconnected';
-    const newData = await Injector.get(
-      InjectionKey.DataSourcesService,
-    ).getDataSource(data.url);
+    const newData = await DataSourcesHttpService.getDataSource(data.url);
     if (newData) {
       ds._id = newData.id;
       ds._name = newData.name;
@@ -126,16 +123,11 @@ export class DataSource
   }
 
   public async listStreams(): Promise<LogStreamResponse[]> {
-    return await Injector.get(InjectionKey.DataSourcesService).getStreams(
-      this.url,
-    );
+    return await DataSourcesHttpService.getStreams(this.url);
   }
 
   public async getStream(id: string): Promise<LogStreamResponse | undefined> {
-    return await Injector.get(InjectionKey.LogStreamsService).getStream(
-      this.url,
-      id,
-    );
+    return await LogStreamsHttpService.getStream(this.url, id);
   }
 
   public subscribe(streamId: string) {

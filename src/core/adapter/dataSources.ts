@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { DataSource } from '@/core/domain/DataSource';
-import { StorageKeys } from '../stores/util/type';
 import { useLogStreams } from './logStreams';
 import { useLogs } from './logs';
+import { StorageKeys } from './util/storage';
+import { StoredDataSource } from '../model/dataSource';
 
 export const useDataSources = defineStore('log-rush-dataSources', {
   state: () => ({
@@ -58,6 +59,21 @@ export const useDataSources = defineStore('log-rush-dataSources', {
       // TODO: make this general update method using partial object
       this.getRawDataSource(id)?.setAutoConnect(enabled);
       this._saveState();
+    },
+    _init() {
+      const storedSources = localStorage.getItem(StorageKeys.DataSources);
+      if (!storedSources) return;
+
+      const parsedDataSources = JSON.parse(storedSources) as StoredDataSource[];
+      for (const _cachedDs of parsedDataSources) {
+        DataSource.createFromCache(_cachedDs, {
+          onLog: useLogs()._createLogHandler(),
+        }).then((ds) => {
+          this._dataSources[ds.id] = ds;
+          useLogStreams()._prepareDataSource(ds.id);
+          this._saveState();
+        });
+      }
     },
   },
 });

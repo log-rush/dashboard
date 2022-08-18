@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { Config, ConfigKey } from '../model/config';
-import { StorageKeys } from '../stores/util/type';
+import { StorageKeys } from './util/storage';
 
 export const useConfig = defineStore('log-rush-config', {
   state: () => ({
