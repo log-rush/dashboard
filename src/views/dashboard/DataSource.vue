@@ -80,7 +80,9 @@
           <Status :status="dataSource?.status ?? 'warn'" />
           <template v-if="dataSource">
             <n-button
-              v-if="dataSource.status === 'disconnected'"
+              v-if="
+                dataSource.status === 'warn' || dataSource.status === 'error'
+              "
               key="reconnectButton"
               secondary
               @click="reconnect()"
