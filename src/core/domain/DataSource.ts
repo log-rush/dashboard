@@ -9,9 +9,11 @@ import { LogRecord } from '@/core/model/log';
 import { RecordAble, StorageRecordAble } from '../model/helper';
 import { DataSourcesHttpService } from '../services/DataSourceService';
 import { LogStreamsHttpService } from '../services/LogStreamsService';
+import { noop } from '../adapter/util/helper';
 
 interface DataSourceUpdateHandler {
-  onLog(stream: string, log: LogRecord): void;
+  onLog?(stream: string, log: LogRecord): void;
+  onStatusUpdate?(status: ConnectionStatus): void;
 }
 
 export class DataSource
@@ -19,38 +21,14 @@ export class DataSource
 {
   private _connection: DataSourceConnection | undefined = undefined;
   private _updateHandler: DataSourceUpdateHandler;
-  private _connectionStatus: ConnectionStatus = 'disconnected';
-
-  public get id(): string {
-    return this._id;
-  }
-
-  public get url(): string {
-    return this._url;
-  }
-
-  public get name(): string {
-    return this._name;
-  }
-
-  public get version(): string {
-    return this._version;
-  }
-
-  public get status(): ConnectionStatus {
-    return this._connectionStatus;
-  }
-
-  public get autoConnect(): boolean {
-    return this._autoConnect;
-  }
+  public status: ConnectionStatus = 'disconnected';
 
   private constructor(
-    private _id: string,
-    private _url: string,
-    private _name: string,
-    private _version: string,
-    private _autoConnect: boolean,
+    public id: string,
+    public url: string,
+    public name: string,
+    public version: string,
+    public autoConnect: boolean,
   ) {
     this._updateHandler = {
       onLog() {
@@ -63,7 +41,7 @@ export class DataSource
     const data = await DataSourcesHttpService.getDataSource(url);
     if (data) {
       const ds = new DataSource(data.id, url, data.name, data.version, false);
-      ds._connectionStatus = 'available';
+      ds.status = 'available';
       return ds;
     }
     return undefined;
@@ -73,7 +51,6 @@ export class DataSource
     data: StoredDataSource,
     handler: DataSourceUpdateHandler,
   ): Promise<DataSource> {
-    console.log(data);
     const ds = new DataSource(
       data.id,
       data.url,
@@ -81,13 +58,13 @@ export class DataSource
       data.version,
       data.autoConnect,
     );
-    ds._connectionStatus = 'disconnected';
+    ds.status = 'disconnected';
     const newData = await DataSourcesHttpService.getDataSource(data.url);
     if (newData) {
-      ds._id = newData.id;
-      ds._name = newData.name;
-      ds._version = newData.version;
-      ds._connectionStatus = 'available';
+      // dont update id -> breaks store
+      ds.name = newData.name;
+      ds.version = newData.version;
+      ds.status = 'available';
     }
     if (ds.autoConnect) {
       ds.connect(handler);
@@ -103,10 +80,14 @@ export class DataSource
         this.url.split('://')[1],
       );
     }
-    this._connection.setLogHandler(handler.onLog);
-    this._connection.setStatusUpdateHandler((status) => {
-      this._connectionStatus = status;
-    });
+    this._connection.setLogHandler(handler.onLog ?? noop);
+    this._connection.setStatusUpdateHandler(
+      handler.onStatusUpdate ??
+        ((status) => {
+          // fallback (is not reactive)
+          this.status = status;
+        }),
+    );
   }
 
   public disconnect() {
@@ -140,10 +121,6 @@ export class DataSource
     if (this._connection) {
       this._connection.unsubscribe(streamId);
     }
-  }
-
-  public setAutoConnect(enabled: boolean) {
-    this._autoConnect = enabled;
   }
 
   toRecord(): DataSourceRecord {

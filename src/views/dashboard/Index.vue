@@ -3,7 +3,7 @@
     <n-space vertical size="large">
       <n-space vertical :size="0">
         <n-h2>Overview</n-h2>
-        <n-h3> DataSources ({{ allDataSources.length }}) </n-h3>
+        <n-h3> DataSources ({{ statusArray.length }}) </n-h3>
         <n-space vertical size="small">
           <n-space align="center">
             <Status :status="'connected'" />
@@ -53,34 +53,26 @@ import { NH2, NH3, NP, NSpace, NButton } from 'naive-ui';
 import Status from '@/components/util/Status.vue';
 import PageLayout from '@/components/util/PageLayout.vue';
 import CreateDataSource from '@/components/dataSources/modals/CreateDataSource.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useDataSources } from '@/core/adapter/dataSources';
+import { ConnectionStatus } from '@/core/model/dataSource';
 
 const dataSourcesStore = useDataSources();
 const createModelOpen = ref(false);
-const allDataSources = computed(() => dataSourcesStore.allDataSources);
-const connectedCount = computed(
-  () =>
-    dataSourcesStore.allDataSources.filter((ds) => ds.status === 'connected')
-      .length,
+const statusArray = computed(() =>
+  dataSourcesStore.allDataSources.map((ds) => ds.status),
 );
-const availableCount = computed(
-  () =>
-    dataSourcesStore.allDataSources.filter((ds) => ds.status === 'available')
-      .length,
-);
-const warnCount = computed(
-  () =>
-    dataSourcesStore.allDataSources.filter((ds) => ds.status === 'warn').length,
-);
-const disconnectedCount = computed(
-  () =>
-    dataSourcesStore.allDataSources.filter((ds) => ds.status === 'disconnected')
-      .length,
-);
-const errorCount = computed(
-  () =>
-    dataSourcesStore.allDataSources.filter((ds) => ds.status === 'error')
-      .length,
-);
+const connectedCount = ref(0);
+const availableCount = ref(0);
+const warnCount = ref(0);
+const disconnectedCount = ref(0);
+const errorCount = ref(0);
+
+watch(statusArray, (status: ConnectionStatus[]) => {
+  connectedCount.value = status.filter((s) => s === 'connected').length;
+  availableCount.value = status.filter((s) => s === 'available').length;
+  warnCount.value = status.filter((s) => s === 'warn').length;
+  disconnectedCount.value = status.filter((s) => s === 'disconnected').length;
+  errorCount.value = status.filter((s) => s === 'error').length;
+});
 </script>

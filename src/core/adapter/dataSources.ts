@@ -3,7 +3,7 @@ import { DataSource } from '@/core/domain/DataSource';
 import { useLogStreams } from './logStreams';
 import { useLogs } from './logs';
 import { StorageKeys } from './util/storage';
-import { StoredDataSource } from '../model/dataSource';
+import { ConnectionStatus, StoredDataSource } from '../model/dataSource';
 
 export const useDataSources = defineStore('log-rush-dataSources', {
   state: () => ({
@@ -24,6 +24,13 @@ export const useDataSources = defineStore('log-rush-dataSources', {
           Object.values(this._dataSources).map((ds) => ds.toStorageRecord()),
         ),
       );
+    },
+    _createStatusUpdater(id: string) {
+      return (status: ConnectionStatus) => {
+        if (this._dataSources[id]) {
+          this._dataSources[id].status = status;
+        }
+      };
     },
     async createDataSource(url: string) {
       const dataSource = await DataSource.create(url);
@@ -48,17 +55,24 @@ export const useDataSources = defineStore('log-rush-dataSources', {
       this.getRawDataSource(id)?.reconnect();
     },
     connect(id: string) {
-      this.getRawDataSource(id)?.connect({
-        onLog: useLogs()._createLogHandler(),
-      });
+      const ds = this.getRawDataSource(id);
+      if (ds) {
+        ds.connect({
+          onLog: useLogs()._createLogHandler(),
+          onStatusUpdate: this._createStatusUpdater(id),
+        });
+      }
     },
     disconnect(id: string) {
       this.getRawDataSource(id)?.disconnect();
     },
     setAutoConnect(id: string, enabled: boolean) {
       // TODO: make this general update method using partial object
-      this.getRawDataSource(id)?.setAutoConnect(enabled);
-      this._saveState();
+      const ds = this.getRawDataSource(id);
+      if (ds) {
+        ds.autoConnect = enabled;
+        this._saveState();
+      }
     },
     _init() {
       const storedSources = localStorage.getItem(StorageKeys.DataSources);
@@ -68,6 +82,7 @@ export const useDataSources = defineStore('log-rush-dataSources', {
       for (const _cachedDs of parsedDataSources) {
         DataSource.createFromCache(_cachedDs, {
           onLog: useLogs()._createLogHandler(),
+          onStatusUpdate: this._createStatusUpdater(_cachedDs.id),
         }).then((ds) => {
           this._dataSources[ds.id] = ds;
           useLogStreams()._prepareDataSource(ds.id);
