@@ -69,7 +69,11 @@
           </n-empty>
         </n-space>
       </n-space>
-      <LogPeekModal :stream="logPeekStream" @close="closeLogPeek()" />
+      <LogPeekModal
+        :stream="logPeekStream"
+        :data-source="dataSource.id"
+        @close="closeLogPeek()"
+      />
     </template>
     <template v-else>
       <n-empty description="DataSource ot found"> </n-empty>

@@ -11,6 +11,7 @@ import { useLogs } from '@/core/adapter/logs';
 import { useConfig } from '@/core/adapter/config';
 
 const props = defineProps<{
+  dataSource: string;
   stream: string;
 }>();
 
@@ -24,7 +25,8 @@ const formatter = new LogFormatter({
 });
 
 onMounted(() => {
-  const storedLogs = logStore.getLogs(props.stream);
+  const storedLogs = logStore.getLogs(props.dataSource, props.stream);
+  console.log('stored:', storedLogs);
   for (const log of storedLogs) {
     appendLog(log.message);
   }
@@ -32,8 +34,9 @@ onMounted(() => {
 
 watch(
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  () => logStore.getLastLog(props.stream)!,
+  () => logStore.getLastLog(props.dataSource, props.stream)!,
   (newLog) => {
+    console.log('updated', newLog);
     if (newLog) {
       appendLog(newLog.message);
     }

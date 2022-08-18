@@ -13,7 +13,7 @@
           Close
         </n-button>
       </template>
-      <log-view v-if="stream" :stream="stream" />
+      <log-view v-if="stream" :stream="stream" :data-source="dataSource" />
     </n-card>
   </n-modal>
 </template>
@@ -24,10 +24,11 @@ import { defineProps, defineEmits, toRefs } from 'vue';
 import LogView from '@/components/logs/LogView.vue';
 
 const props = defineProps<{
+  dataSource?: string;
   stream?: string;
 }>();
 
-const { stream } = toRefs(props);
+const { stream, dataSource } = toRefs(props);
 
 const emit = defineEmits<{
   (event: 'close'): void;
