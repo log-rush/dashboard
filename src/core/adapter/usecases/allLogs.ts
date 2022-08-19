@@ -41,12 +41,12 @@ export const useAllLogs = defineStore('log-rush--all-logs', () => {
           unwatch: watch(
             () => logsStore.getLastLog(stream.dataSource, stream.id),
             (log) => {
-              if (log && showNamesRef.value) {
+              if (log && showNamesRef.value && log.message.length > 0) {
                 logRef.value = {
                   message: `${stream.alias} | ${log.message}`,
                   timestamp: log.timestamp,
                 };
-              } else if (log) {
+              } else if (log && log.message.length > 0) {
                 logRef.value = log;
               }
             },
