@@ -33,6 +33,11 @@
           Can't find the DataSource. (HTTP Request returned an invalid response)
         </n-alert>
       </template>
+      <template v-if="dataSourceExists">
+        <n-alert title="DataSource already exists" type="error">
+          A DataSource with this url already exists.
+        </n-alert>
+      </template>
       <template #footer>
         <n-space justify="end" size="small">
           <n-button strong secondary type="error" @click="emit('close')"
@@ -87,6 +92,7 @@ const dataSources = useDataSources();
 const formRef = ref<FormInst | null>(null);
 const createDisabled = ref(false);
 const cantFindDataSource = ref(false);
+const dataSourceExists = ref(false);
 const formValue = ref({
   url: '',
 });
@@ -136,9 +142,16 @@ watch(formRef, (value) => {
 const createDataSource = (e: MouseEvent) => {
   e.preventDefault();
   cantFindDataSource.value = false;
+  dataSourceExists.value = false;
+
   formRef.value?.validate(
     async (errors: Array<FormValidationError> | undefined) => {
       if (!errors) {
+        const exists = dataSources.getDataSourceByUrl(formValue.value.url);
+        if (exists) {
+          dataSourceExists.value = true;
+          return;
+        }
         const success = await dataSources.createDataSource(formValue.value.url);
         if (success) {
           emit('close');

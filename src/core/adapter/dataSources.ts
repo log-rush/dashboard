@@ -3,7 +3,11 @@ import { DataSource } from '@/core/domain/DataSource';
 import { useLogStreams } from './logStreams';
 import { useLogs } from './logs';
 import { StorageKeys } from './util/storage';
-import { ConnectionStatus, StoredDataSource } from '../model/dataSource';
+import {
+  ConnectionStatus,
+  DataSourceRecord,
+  StoredDataSource,
+} from '../model/dataSource';
 
 export const useDataSources = defineStore('log-rush-dataSources', {
   state: () => ({
@@ -15,6 +19,9 @@ export const useDataSources = defineStore('log-rush-dataSources', {
     getDataSource: (state) => (dsId: string) =>
       state._dataSources[dsId]?.toRecord(),
     getRawDataSource: (state) => (dsId: string) => state._dataSources[dsId],
+    getDataSourceByUrl(): (url: string) => DataSourceRecord | undefined {
+      return (url: string) => this.allDataSources.find((ds) => ds.url === url);
+    },
   },
   actions: {
     _saveState() {
