@@ -6,6 +6,7 @@ import DataSourcesList from '@/views/dashboard/DataSourcesList.vue';
 import View from '@/views/dashboard/View.vue';
 import ViewsList from '@/views/dashboard/ViewsList.vue';
 import AllLogs from '@/views/dashboard/AllLogs.vue';
+import Settings from '@/views/dashboard/Settings.vue';
 import EmptyOutlet from '@/components/util/EmptyRouterView.vue';
 import { createRouteMeta } from '@/core/model/routeMetaData';
 
@@ -57,7 +58,19 @@ const routes: Array<RouteRecordRaw> = [
         path: '/views/:id',
         component: View,
       },
+      {
+        path: '/settings',
+        component: Settings,
+      },
+      {
+        path: '/:pathMatch(.*)*',
+        redirect: '/',
+      },
     ],
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
   },
 ];
 
