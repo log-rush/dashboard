@@ -1,1 +1,2 @@
-- modal in all logs section for toggling stream subscription
+- fix ui of stream buttons on data source detail
+- dont add stored logs to all logs when including a new stream
