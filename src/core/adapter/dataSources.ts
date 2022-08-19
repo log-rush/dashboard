@@ -87,10 +87,10 @@ export const useDataSources = defineStore('log-rush-dataSources', {
 
       const parsedDataSources = JSON.parse(storedSources) as StoredDataSource[];
       for (const _cachedDs of parsedDataSources) {
-        DataSource.createFromCache(_cachedDs, {
-          onLog: useLogs()._createLogHandler(_cachedDs.id),
-          onStatusUpdate: this._createStatusUpdater(_cachedDs.id),
-        }).then((ds) => {
+        DataSource.createFromCache(_cachedDs, (id) => ({
+          onLog: useLogs()._createLogHandler(id),
+          onStatusUpdate: this._createStatusUpdater(id),
+        })).then((ds) => {
           this._dataSources[ds.id] = ds;
           useLogStreams()._prepareDataSource(ds.id);
           this._saveState();

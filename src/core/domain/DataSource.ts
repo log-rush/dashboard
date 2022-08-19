@@ -49,7 +49,7 @@ export class DataSource
 
   static async createFromCache(
     data: StoredDataSource,
-    handler: DataSourceUpdateHandler,
+    handler: (dsId: string) => DataSourceUpdateHandler,
   ): Promise<DataSource> {
     const ds = new DataSource(
       data.id,
@@ -61,13 +61,13 @@ export class DataSource
     ds.status = 'disconnected';
     const newData = await DataSourcesHttpService.getDataSource(data.url);
     if (newData) {
-      // dont update id -> breaks store
+      ds.id = newData.id;
       ds.name = newData.name;
       ds.version = newData.version;
       ds.status = 'available';
     }
     if (ds.autoConnect) {
-      ds.connect(handler);
+      ds.connect(handler(ds.id));
     }
     return ds;
   }

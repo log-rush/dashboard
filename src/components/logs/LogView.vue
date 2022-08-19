@@ -26,7 +26,6 @@ const formatter = new LogFormatter({
 
 onMounted(() => {
   const storedLogs = logStore.getLogs(props.dataSource, props.stream);
-  console.log('stored:', storedLogs);
   for (const log of storedLogs) {
     appendLog(log.message);
   }
@@ -36,7 +35,6 @@ watch(
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   () => logStore.getLastLog(props.dataSource, props.stream)!,
   (newLog) => {
-    console.log('updated', newLog);
     if (newLog) {
       appendLog(newLog.message);
     }
