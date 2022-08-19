@@ -39,19 +39,21 @@
                 <n-space justify="end" align="center" :wrap="false">
                   <Status :status="stream.status" />
                   <template v-if="dataSource?.status === 'connected'">
-                    <n-button @click="openLogPeek(stream.id)"
+                    <n-button secondary @click="openLogPeek(stream.id)"
                       >Show Logs</n-button
                     >
 
                     <n-button
                       v-if="!stream.isSubscribed"
+                      secondary
+                      type="success"
                       @click="subscribe(stream.id)"
                       >Subscribe</n-button
                     >
                     <n-button
                       v-else
+                      secondary
                       type="error"
-                      ghost
                       @click="unsubscribe(stream.id)"
                       >Unsubscribe</n-button
                     >
