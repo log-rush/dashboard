@@ -35,18 +35,20 @@ export const useAllLogs = defineStore('log-rush--all-logs', () => {
     }
     for (const stream of current) {
       if (stream.id in watchers) {
+        // subscription stays
         watchers[stream.id].flagged = false;
-      } else if (logsStore.getLastLog(stream.dataSource, stream.id)) {
+      } else {
+        // new watcher
         watchers[stream.id] = {
           unwatch: watch(
             () => logsStore.getLastLog(stream.dataSource, stream.id),
             (log) => {
-              if (log && showNamesRef.value && log.message.length > 0) {
+              if (log && showNamesRef.value) {
                 logRef.value = {
                   message: `${stream.alias} | ${log.message}`,
                   timestamp: log.timestamp,
                 };
-              } else if (log && log.message.length > 0) {
+              } else if (log) {
                 logRef.value = log;
               }
             },
@@ -55,6 +57,7 @@ export const useAllLogs = defineStore('log-rush--all-logs', () => {
         };
       }
     }
+    // remove removed subscriptions
     for (const [key, watcher] of Object.entries(watchers)) {
       if (watcher.flagged) {
         watcher.unwatch();

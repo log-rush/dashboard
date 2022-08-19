@@ -85,6 +85,7 @@ const showStoredLogs = () => {
 };
 
 const appendLog = (data: string) => {
+  if (data.length === 0) return;
   const formatted = formatter.format(data);
   if (wrapper.value) {
     wrapper.value.innerHTML += formatted;

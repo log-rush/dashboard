@@ -26,10 +26,7 @@ export const useLogs = defineStore('log-rush-logs', {
     _createLogHandler(dsId: string) {
       return (streamId: string, log: LogRecord) => {
         if (this._logs[createKey(dsId, streamId)]) {
-          const lastLog = this._logs[createKey(dsId, streamId)].lastLog;
-          if (lastLog) {
-            this._logs[createKey(dsId, streamId)].logs.push(lastLog);
-          }
+          this._logs[createKey(dsId, streamId)].logs.push(log);
           this._logs[createKey(dsId, streamId)].lastLog = log;
         }
       };
