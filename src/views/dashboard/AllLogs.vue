@@ -19,7 +19,14 @@
               <n-p>Show Names</n-p>
             </n-space>
           </n-button>
+          <n-button secondary size="large" @click="resetLogs">
+            Clear
+            <template #icon>
+              <Icon icon="mdi:archive-remove-outline"></Icon>
+            </template>
+          </n-button>
           <n-button secondary size="large" @click="managerModalOpen = true">
+            Manage
             <template #icon>
               <Icon icon="mdi:archive-cog-outline"></Icon>
             </template>

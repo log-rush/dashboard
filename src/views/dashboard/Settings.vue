@@ -5,6 +5,6 @@
 </template>
 
 <script setup lang="ts">
-import { NH2, NH3, NP, NSpace, NButton } from 'naive-ui';
+import { NSpace} from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
 </script>
