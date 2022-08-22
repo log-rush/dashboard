@@ -17,3 +17,7 @@ export type LogStreamResponse = {
   alias: string;
   id: string;
 };
+
+export type DataSourcePluginsResponse = {
+  routerPlugins: string[];
+};

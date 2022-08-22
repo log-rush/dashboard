@@ -24,6 +24,12 @@
           </n-space>
         </n-space>
         <n-h2>LogStreams</n-h2>
+        <LogFileModal
+          :isOpen="detailStream !== undefined"
+          :data-source="dataSource.id"
+          :stream="detailStream"
+          @close="detailStream = undefined"
+        />
         <n-space vertical>
           <n-list bordered v-if="logStreams.length > 0">
             <n-list-item v-for="stream of logStreams" :key="stream.id">
@@ -42,7 +48,6 @@
                     <n-button secondary @click="openLogPeek(stream.id)"
                       >Show Logs</n-button
                     >
-
                     <n-button
                       v-if="!stream.isSubscribed"
                       secondary
@@ -57,6 +62,24 @@
                       @click="unsubscribe(stream.id)"
                       >Unsubscribe</n-button
                     >
+                    <n-popover placement="bottom" trigger="click">
+                      <template #trigger>
+                        <n-button secondary>
+                          <template #icon>
+                            <Icon icon="mdi:dots-vertical"></Icon>
+                          </template>
+                        </n-button>
+                      </template>
+                      <n-space vertical>
+                        <n-button
+                          v-if="showLogFilesButton"
+                          secondary
+                          @click="detailStream = stream.id"
+                        >
+                          Show Logfiles
+                        </n-button>
+                      </n-space>
+                    </n-popover>
                   </template>
                 </n-space>
               </template>
@@ -143,6 +166,7 @@ import {
   NH6,
   NP,
   NSwitch,
+  NPopover,
   useDialog,
 } from 'naive-ui';
 import PageLayout from '@/components/util/PageLayout.vue';
@@ -152,11 +176,16 @@ import Status from '@/components/util/Status.vue';
 import { useRoute, useRouter } from 'vue-router';
 import LogPeekModal from '@/components/streams/modals/LogPeekModal.vue';
 import { LogStreamRecord } from '@/core/model/logStream';
+import { DataSourcePluginsResponse } from '@/core/model/api/httpTypes';
 import { useDataSources } from '@/core/adapter/dataSources';
 import { useLogStreams } from '@/core/adapter/logStreams';
+import { useConfig } from '@/core/adapter/config';
+import { Icon } from '@iconify/vue';
+import LogFileModal from '../../components/streams/modals/LogFileModal.vue';
 
 const dataSourcesStore = useDataSources();
 const logStreamStore = useLogStreams();
+const configStore = useConfig();
 const dialog = useDialog();
 const route = useRoute();
 const router = useRouter();
@@ -166,6 +195,11 @@ const dataSource = computed<DataSourceRecord | undefined>(() =>
 const logStreams = ref<LogStreamRecord[]>([]);
 const closeLogPeekFunction = ref<(() => void) | undefined>(undefined);
 const logPeekStream = ref<string | undefined>(undefined);
+const dataSourcePlugins = ref<DataSourcePluginsResponse | undefined>(undefined);
+const showLogFilesButton = computed(() =>
+  dataSourcePlugins.value?.routerPlugins.includes('persistency'),
+); // TODO: store this in const
+const detailStream = ref<string | undefined>(undefined);
 
 onMounted(() => {
   refresh();
@@ -237,6 +271,9 @@ const refresh = async () => {
   if (dataSource.value) {
     logStreams.value = await logStreamStore.getStreamsForDataSource(
       dataSource.value.id,
+    );
+    dataSourcePlugins.value = await configStore.getDataSourcePlugins(
+      dataSource.value.url,
     );
   }
 };

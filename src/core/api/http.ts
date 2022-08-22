@@ -1,5 +1,6 @@
 import {
   DataSourceInfoResponse,
+  DataSourcePluginsResponse,
   LogStreamResponse,
   LogStreamsListResponse,
 } from '../model/api/httpTypes';
@@ -46,6 +47,22 @@ export const LogRushHttpApi = {
       }
       const res: LogStreamResponse = await req.json();
       return res;
+    } catch (e: unknown) {
+      return undefined;
+    }
+  },
+  async getPlugins(
+    url: string,
+  ): Promise<DataSourcePluginsResponse | undefined> {
+    try {
+      const req = await fetch(`${url}meta/plugins`);
+      if (req.status !== 200) {
+        return undefined;
+      }
+      const res: DataSourcePluginsResponse = await req.json();
+      return {
+        routerPlugins: res.routerPlugins,
+      };
     } catch (e: unknown) {
       return undefined;
     }
