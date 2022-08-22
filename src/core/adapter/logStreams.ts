@@ -63,6 +63,7 @@ export const useLogStreams = defineStore('log-rush-logStreams', {
     },
     unsubscribe(dsId: string, id: string) {
       this.getRawStream(dsId, id)?.unsubscribe();
+      useLogs().clearLogs(dsId, id);
     },
   },
 });
