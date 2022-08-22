@@ -19,7 +19,7 @@
               <n-p>Show Names</n-p>
             </n-space>
           </n-button>
-          <n-button secondary size="large" @click="resetLogs">
+          <n-button tertiary size="large" type="error" @click="resetLogs">
             Clear
             <template #icon>
               <Icon icon="mdi:archive-remove-outline"></Icon>
