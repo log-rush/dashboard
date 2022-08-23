@@ -53,7 +53,7 @@ import { NH2, NH3, NP, NSpace, NButton } from 'naive-ui';
 import Status from '@/components/util/Status.vue';
 import PageLayout from '@/components/util/PageLayout.vue';
 import CreateDataSource from '@/components/dataSources/modals/CreateDataSource.vue';
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useDataSources } from '@/core/adapter/dataSources';
 import { ConnectionStatus } from '@/core/model/dataSource';
 
@@ -69,10 +69,18 @@ const disconnectedCount = ref(0);
 const errorCount = ref(0);
 
 watch(statusArray, (status: ConnectionStatus[]) => {
+  calculateStatus(status);
+});
+
+onMounted(() => {
+  calculateStatus(statusArray.value);
+});
+
+const calculateStatus = (status: ConnectionStatus[]) => {
   connectedCount.value = status.filter((s) => s === 'connected').length;
   availableCount.value = status.filter((s) => s === 'available').length;
   warnCount.value = status.filter((s) => s === 'warn').length;
   disconnectedCount.value = status.filter((s) => s === 'disconnected').length;
   errorCount.value = status.filter((s) => s === 'error').length;
-});
+};
 </script>
