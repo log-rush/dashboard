@@ -9,16 +9,23 @@
       </n-h1>
     </template>
     <template #header>
-      <n-breadcrumb>
-        <n-breadcrumb-item
-          v-for="breadcrumb of breadcrumbs"
-          :key="breadcrumb.title + breadcrumb.link"
-        >
-          <router-link :to="breadcrumb.link">
-            <n-text> {{ breadcrumb.title }} </n-text>
-          </router-link>
-        </n-breadcrumb-item>
-      </n-breadcrumb>
+      <n-space align="center" justify="space-between">
+        <n-breadcrumb>
+          <n-breadcrumb-item
+            v-for="breadcrumb of breadcrumbs"
+            :key="breadcrumb.title + breadcrumb.link"
+          >
+            <router-link :to="breadcrumb.link">
+              <n-text> {{ breadcrumb.title }} </n-text>
+            </router-link>
+          </n-breadcrumb-item>
+        </n-breadcrumb>
+        <n-button size="small" circle secondary type="tertiary" @click="goBack">
+          <template #icon>
+            <Icon icon="mdi:chevron-left" />
+          </template>
+        </n-button>
+      </n-space>
     </template>
     <template #extra>
       <slot name="extra"></slot>
@@ -39,12 +46,15 @@ import {
   NBreadcrumb,
   NBreadcrumbItem,
   NText,
+  NButton,
 } from 'naive-ui';
 import { ref, watch, defineProps, onMounted } from 'vue';
-import { RouteLocationMatched, useRoute } from 'vue-router';
+import { RouteLocationMatched, useRoute, useRouter } from 'vue-router';
+import { Icon } from '@iconify/vue';
 
 const breadcrumbs = ref<{ title: string; link: string }[]>([]);
 const route = useRoute();
+const router = useRouter();
 
 defineProps<{
   title: string;
@@ -58,6 +68,10 @@ watch(
 onMounted(() => {
   calculateBreadcrumbs(route.matched);
 });
+
+const goBack = () => {
+  router.push(route.fullPath.split('/').slice(0, -1).join('/') || '/');
+};
 
 const calculateBreadcrumbs = (routes: RouteLocationMatched[]) => {
   const breadcrumbRoutes = routes.filter((r) => r.meta && r.meta.breadcrumb);
