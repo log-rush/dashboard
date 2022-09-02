@@ -22,7 +22,35 @@
               @update:value="toggleAutoConnect"
             ></n-switch>
           </n-space>
+          <div id="spacer"></div>
+          <n-popover
+            placement="bottom"
+            trigger="click"
+            v-if="showServerLogsButton"
+          >
+            <template #trigger>
+              <n-button secondary>
+                <template #icon>
+                  <Icon icon="mdi:dots-vertical"></Icon>
+                </template>
+              </n-button>
+            </template>
+            <n-space vertical>
+              <n-button
+                v-if="showServerLogsButton"
+                secondary
+                @click="showServerLogsModalOpen = true"
+              >
+                Show raw server logs
+              </n-button>
+            </n-space>
+          </n-popover>
         </n-space>
+        <ShowRawServerLogsModal
+          :base-url="dataSource.url"
+          :is-open="showServerLogsModalOpen"
+          @close="showServerLogsModalOpen = false"
+        />
         <n-h2>LogStreams</n-h2>
         <LogFileModal
           :isOpen="detailStream !== undefined"
@@ -182,6 +210,7 @@ import { useLogStreams } from '@/core/adapter/logStreams';
 import { useConfig } from '@/core/adapter/config';
 import { Icon } from '@iconify/vue';
 import LogFileModal from '../../components/streams/modals/LogFileModal.vue';
+import ShowRawServerLogsModal from '@/components/plugins/raw-logs/ShowRawServerLogsModal.vue';
 
 const dataSourcesStore = useDataSources();
 const logStreamStore = useLogStreams();
@@ -199,7 +228,11 @@ const dataSourcePlugins = ref<DataSourcePluginsResponse | undefined>(undefined);
 const showLogFilesButton = computed(() =>
   dataSourcePlugins.value?.routerPlugins.includes('persistency'),
 ); // TODO: store this in const
+const showServerLogsButton = computed(() =>
+  dataSourcePlugins.value?.routerPlugins.includes('raw-logs'),
+); // TODO: store this in const
 const detailStream = ref<string | undefined>(undefined);
+const showServerLogsModalOpen = ref(false);
 
 onMounted(() => {
   refresh();
@@ -284,3 +317,9 @@ const reconnect = () => {
   }
 };
 </script>
+
+<style lang="css">
+div:has(> div#spacer) {
+  flex-grow: 1;
+}
+</style>
