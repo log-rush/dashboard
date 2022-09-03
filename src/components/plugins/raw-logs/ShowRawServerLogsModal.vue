@@ -33,7 +33,7 @@
         v-if="currentFileName !== undefined"
         :is-open="currentFileName !== undefined"
         :file-name="currentFileName ?? ''"
-        :file-url="`${baseUrl}plugins/raw-logs/${currentFileName}`"
+        :file-url="RawLogsPluginApi.getFileUrl(baseUrl, currentFileName)"
         @close="closeLogModal()"
       />
       <template #header-extra>
@@ -50,6 +50,7 @@ import { NModal, NCard, NButton, NList, NListItem, NSpace } from 'naive-ui';
 import { defineProps, defineEmits, ref, onMounted } from 'vue';
 import { Icon } from '@iconify/vue';
 import StaticLogsModal from '../../streams/modals/StaticLogsModal.vue';
+import { RawLogsPluginApi } from '@/core/services/plugins/raw-logs/RawLogsApi';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -63,16 +64,12 @@ const emit = defineEmits<{
 const files = ref<string[]>([]);
 const currentFileName = ref<string | undefined>(undefined);
 
-onMounted(() => {
-  fetch(`${props.baseUrl}plugins/raw-logs/list-all`)
-    .then((res) => res.json())
-    .then((logFiles: string[]) => {
-      files.value = logFiles;
-    });
+onMounted(async () => {
+  files.value = await RawLogsPluginApi.getLogFiles(props.baseUrl);
 });
 
 const openFile = (file: string) => {
-  window.open(`${props.baseUrl}plugins/raw-logs/${file}`, '_blank');
+  window.open(RawLogsPluginApi.getFileUrl(props.baseUrl, file), '_blank');
 };
 const showFile = (file: string) => {
   currentFileName.value = file;
